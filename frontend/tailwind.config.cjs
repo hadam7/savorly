@@ -1,8 +1,11 @@
-/ /** @type {import('tailwindcss').Config} */
+/ / ** @type { import('tailwindcss').Config } */
 module.exports = {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Outfit', 'sans-serif'],
+      },
       colors: {
         brand: {
           dark: '#46873E', // 46873E
