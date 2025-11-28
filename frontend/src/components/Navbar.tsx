@@ -1,12 +1,14 @@
 import { Link, useLocation } from 'react-router-dom';
-import { ChefHat, Home, BookOpen, LogIn, UserPlus, Search } from 'lucide-react';
+import { ChefHat, Home, BookOpen, LogIn, UserPlus, Search, User } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useAuth } from '../hooks/useAuth';
 
 export default function Navbar() {
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const { authenticated } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -67,25 +69,42 @@ export default function Navbar() {
 
         {/* Auth Buttons */}
         <div className="flex items-center gap-3 pl-4 border-l border-slate-200/60">
-          <Link
-            to="/login"
-            className={`
-              flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-all duration-300
-              ${isActive('/login')
-                ? 'text-slate-900 bg-slate-100'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}
-            `}
-          >
-            <LogIn size={18} strokeWidth={2} />
-            <span>Belépés</span>
-          </Link>
-          <Link
-            to="/register"
-            className="group flex items-center gap-2 rounded-full bg-slate-900 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-slate-900/20 transition-all duration-300 hover:bg-slate-800 hover:shadow-xl hover:shadow-slate-900/30 hover:-translate-y-0.5"
-          >
-            <UserPlus size={18} strokeWidth={2} className="transition-transform duration-300 group-hover:scale-110" />
-            <span>Regisztráció</span>
-          </Link>
+          {authenticated ? (
+            <Link
+              to="/profile"
+              className={`
+                flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-300
+                ${isActive('/profile')
+                  ? 'text-white bg-[#BD95A4] shadow-md shadow-[#BD95A4]/30'
+                  : 'text-slate-600 hover:text-[#BD95A4] hover:bg-[#BD95A4]/10'}
+              `}
+            >
+              <User size={20} strokeWidth={2} />
+              <span className="hidden sm:inline">Profil</span>
+            </Link>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className={`
+                  flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-all duration-300
+                  ${isActive('/login')
+                    ? 'text-slate-900 bg-slate-100'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}
+                `}
+              >
+                <LogIn size={18} strokeWidth={2} />
+                <span>Belépés</span>
+              </Link>
+              <Link
+                to="/register"
+                className="group flex items-center gap-2 rounded-full bg-slate-900 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-slate-900/20 transition-all duration-300 hover:bg-slate-800 hover:shadow-xl hover:shadow-slate-900/30 hover:-translate-y-0.5"
+              >
+                <UserPlus size={18} strokeWidth={2} className="transition-transform duration-300 group-hover:scale-110" />
+                <span>Regisztráció</span>
+              </Link>
+            </>
+          )}
         </div>
       </nav>
     </div>

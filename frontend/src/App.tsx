@@ -3,6 +3,7 @@ import { Plus, ArrowRight, Timer, BookOpen } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Login from './views/Login';
 import Register from './views/Register';
+import Profile from './views/Profile';
 import RecipeDetail from './views/RecipeDetail';
 import RecipeCard from './components/RecipeCard';
 import Navbar from './components/Navbar';
@@ -168,6 +169,7 @@ function AppShell() {
           <Route path="/categories" element={<Categories />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </main>
 
