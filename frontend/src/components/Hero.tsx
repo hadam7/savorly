@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles, PlayCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+
 export default function Hero() {
     return (
         <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden px-4">
@@ -38,17 +39,12 @@ export default function Hero() {
                     <span className="text-xs font-semibold text-slate-600 tracking-wide uppercase">A főzés művészete</span>
                 </motion.div>
 
-                <motion.h1
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.2 }}
-                    className="text-5xl md:text-7xl lg:text-8xl font-bold text-slate-900 mb-8 tracking-tight leading-[1.1]"
-                >
+                <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-slate-900 mb-8 tracking-tight leading-[1.1]">
                     Fedezd fel az <br />
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#BD95A4] via-[#A1836C] to-[#755463]">
                         ízek világát
                     </span>
-                </motion.h1>
+                </h1>
 
                 <motion.p
                     initial={{ opacity: 0, y: 20 }}
