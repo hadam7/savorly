@@ -30,7 +30,7 @@ export default function Login() {
   };
 
   return (
-    <section className="mx-auto flex max-w-5xl flex-col items-center gap-10 px-4 py-10 md:flex-row md:items-stretch animate-fade-up">
+    <section className="mx-auto flex max-w-5xl flex-col items-center gap-10 px-4 pt-32 pb-10 md:flex-row md:items-stretch animate-fade-up">
       <div className="hidden flex-1 md:block">
         <div className="glass-card relative h-full overflow-hidden p-6">
           <div className="pointer-events-none absolute -left-10 -top-12 h-40 w-40 rounded-full bg-[#BD95A4]/35 blur-3xl" />

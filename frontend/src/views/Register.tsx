@@ -31,7 +31,7 @@ export default function Register() {
   };
 
   return (
-    <section className="mx-auto flex max-w-5xl flex-col items-center gap-10 px-4 py-10 md:flex-row-reverse md:items-stretch animate-fade-up">
+    <section className="mx-auto flex max-w-5xl flex-col items-center gap-10 px-4 pt-32 pb-10 md:flex-row-reverse md:items-stretch animate-fade-up">
       <div className="hidden flex-1 md:block">
         <div className="glass-card relative h-full overflow-hidden p-6">
           <div className="pointer-events-none absolute -right-16 -top-10 h-44 w-44 rounded-full bg-[#BD95A4]/45 blur-3xl" />

@@ -5,26 +5,47 @@ import { useState, useEffect } from 'react';
 export default function Navbar() {
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      const currentScrollY = window.scrollY;
+
+      // Determine if scrolled for styling
+      setScrolled(currentScrollY > 20);
+
+      // Determine visibility
+      if (currentScrollY < 20) {
+        setIsVisible(true);
+      } else if (currentScrollY > lastScrollY) {
+        // Scrolling down
+        setIsVisible(false);
+      } else {
+        // Scrolling up
+        setIsVisible(true);
+      }
+
+      setLastScrollY(currentScrollY);
     };
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [lastScrollY]);
 
   const isActive = (path: string) =>
     location.pathname === path || (path !== '/' && location.pathname.startsWith(path));
 
   return (
-    <div className={`fixed top-0 left-0 right-0 z-50 flex justify-center transition-all duration-500 ${scrolled ? 'pt-4' : 'pt-8'}`}>
+    <div
+      className={`fixed top-0 left-0 right-0 z-50 flex justify-center transition-all duration-500 pt-8 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}
+    >
       <nav
         className={`
           relative mx-4 flex items-center justify-between gap-8 rounded-full 
           bg-white/90 px-6 shadow-lg shadow-slate-200/20 
           backdrop-blur-xl transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]
-          ${scrolled ? 'w-auto min-w-[600px] py-3' : 'w-full max-w-6xl py-4'}
+          w-full max-w-6xl py-4
         `}
       >
         {/* Logo Area */}
