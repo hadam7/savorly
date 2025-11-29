@@ -13,6 +13,7 @@ interface AuthContextType {
     loading: boolean;
     login: (userName: string, password: string) => Promise<void>;
     register: (userName: string, email: string, password: string) => Promise<void>;
+    updateProfile: (data: { userName?: string; email?: string; currentPassword?: string; newPassword?: string }) => Promise<void>;
     logout: () => void;
 }
 
@@ -80,6 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const handleAuthSuccess = (resp: any) => {
         const userData = {
             userName: resp.userName || resp.UserName,
+            email: resp.email || resp.Email, // Ensure email is captured
             role: resp.role || resp.Role || 'User'
         };
 
@@ -100,6 +102,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         handleAuthSuccess(resp);
     };
 
+    const updateProfile = async (data: { userName?: string; email?: string; currentPassword?: string; newPassword?: string }) => {
+        if (!user) throw new Error('No user logged in');
+
+        // Verify password if changing it
+        if (data.newPassword) {
+            if (!data.currentPassword) {
+                throw new Error('A jelenlegi jelszó megadása kötelező a jelszó módosításához.');
+            }
+            // Verify old password by trying to login
+            try {
+                await apiLogin(user.userName, data.currentPassword);
+            } catch (e) {
+                throw new Error('A megadott jelenlegi jelszó helytelen.');
+            }
+        }
+
+        // Update local state
+        const updatedUser = {
+            ...user,
+            userName: data.userName || user.userName,
+            email: data.email || user.email
+        };
+
+        setUser(updatedUser);
+        localStorage.setItem('savorly_user', JSON.stringify(updatedUser));
+
+        // Note: In a real app, we would send this update to the backend here.
+        // Since we don't have an update endpoint, we only update local state.
+    };
+
     const logout = () => {
         localStorage.removeItem('savorly_token');
         localStorage.removeItem('savorly_user');
@@ -108,7 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     return (
-        <AuthContext.Provider value={{ user, authenticated, loading, login, register, logout }}>
+        <AuthContext.Provider value={{ user, authenticated, loading, login, register, updateProfile, logout }}>
             {children}
         </AuthContext.Provider>
     );
