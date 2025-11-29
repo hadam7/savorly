@@ -5,7 +5,9 @@ export type SampleRecipe = {
   imageUrl: string;
   prepTime: number;
   servings: number;
-  category: string;
+  category: string[];
+  isVegan: boolean;
+  allergens: string[];
   ingredients: string[];
   instructions: string[];
 };
@@ -16,7 +18,9 @@ export const sampleRecipes: SampleRecipe[] = [
     title: 'Krémes fokhagymás csirke',
     prepTime: 25,
     servings: 4,
-    category: 'Egytálétel',
+    category: ['Egytálétel'],
+    isVegan: false,
+    allergens: ['Tej'],
     description: 'Selymes fokhagymás mártásban párolt csirke, gyors vacsorához.',
     imageUrl: 'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=800&q=80',
     ingredients: [
@@ -39,7 +43,9 @@ export const sampleRecipes: SampleRecipe[] = [
     title: 'Mediterrán tésztasaláta',
     prepTime: 20,
     servings: 2,
-    category: 'Könnyű',
+    category: ['Könnyű', 'Vegetáriánus'],
+    isVegan: false,
+    allergens: ['Glutén', 'Tej'],
     description: 'Olivabogyó, paradicsom és feta – friss, üde ízek.',
     imageUrl: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80',
     ingredients: [
@@ -62,7 +68,9 @@ export const sampleRecipes: SampleRecipe[] = [
     title: 'Csokis brownie',
     prepTime: 35,
     servings: 6,
-    category: 'Desszert',
+    category: ['Desszert'],
+    isVegan: false,
+    allergens: ['Tojás', 'Glutén', 'Tej'],
     description: 'Kívül roppanós, belül krémes csoda.',
     imageUrl: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476d?auto=format&fit=crop&w=800&q=80',
     ingredients: [
@@ -85,7 +93,9 @@ export const sampleRecipes: SampleRecipe[] = [
     title: 'Zöldborsókrémleves',
     prepTime: 18,
     servings: 4,
-    category: 'Leves',
+    category: ['Leves', 'Vegetáriánus'],
+    isVegan: false,
+    allergens: ['Tej'],
     description: 'Selymes, mentás zöldborsó, pirított magokkal.',
     imageUrl: 'https://images.unsplash.com/photo-1547592166-23acbe3a624b?auto=format&fit=crop&w=800&q=80',
     ingredients: [
@@ -108,7 +118,9 @@ export const sampleRecipes: SampleRecipe[] = [
     title: 'Sütőtökös gnocchi zsályával',
     prepTime: 30,
     servings: 2,
-    category: 'Vegetáriánus',
+    category: ['Vegetáriánus', 'Tészta'],
+    isVegan: false,
+    allergens: ['Glutén', 'Tej'],
     description: 'Vajas-zsályás öntet, őszi ízekkel.',
     imageUrl: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80',
     ingredients: [
@@ -131,7 +143,9 @@ export const sampleRecipes: SampleRecipe[] = [
     title: 'Csirke tikka masala',
     prepTime: 40,
     servings: 4,
-    category: 'Indiai',
+    category: ['Indiai', 'Egytálétel'],
+    isVegan: false,
+    allergens: ['Tej'],
     description: 'Illatos, paradicsomos szószban párolt csirke.',
     imageUrl: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=800&q=80',
     ingredients: [
@@ -155,6 +169,8 @@ export const sampleRecipes: SampleRecipe[] = [
     prepTime: 10,
     servings: 1,
     category: 'Reggeli',
+    isVegan: false,
+    allergens: ['Glutén', 'Tojás'],
     description: 'Gyors, tápláló indítás a naphoz.',
     imageUrl: 'https://images.unsplash.com/photo-1525351484163-7529414395d8?auto=format&fit=crop&w=800&q=80',
     ingredients: [
@@ -177,7 +193,9 @@ export const sampleRecipes: SampleRecipe[] = [
     title: 'Ropogós sült karfiol tahinivel',
     prepTime: 35,
     servings: 2,
-    category: 'Vegán',
+    category: ['Vegán', 'Könnyű'],
+    isVegan: true,
+    allergens: ['Szezámmag'],
     description: 'Füstös, citromos tahiniöntettel.',
     imageUrl: 'https://images.unsplash.com/photo-1568271991133-4b699820943f?auto=format&fit=crop&w=800&q=80',
     ingredients: [
@@ -199,7 +217,9 @@ export const sampleRecipes: SampleRecipe[] = [
     title: 'Citromos-mákos süti',
     prepTime: 45,
     servings: 8,
-    category: 'Desszert',
+    category: ['Desszert'],
+    isVegan: false,
+    allergens: ['Glutén', 'Tojás'],
     description: 'Frissítő, illatos tepsissüti.',
     imageUrl: 'https://images.unsplash.com/photo-1519340333755-56e9c1d04579?auto=format&fit=crop&w=800&q=80',
     ingredients: [
@@ -222,7 +242,9 @@ export const sampleRecipes: SampleRecipe[] = [
     title: 'Gyors wok zöldségekkel',
     prepTime: 15,
     servings: 2,
-    category: 'Könnyű',
+    category: ['Könnyű', 'Vegán'],
+    isVegan: true,
+    allergens: ['Szója', 'Szezámmag'],
     description: 'Ropogós zöldségek, szójaszószos glaze.',
     imageUrl: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=800&q=80',
     ingredients: [
@@ -245,7 +267,9 @@ export const sampleRecipes: SampleRecipe[] = [
     title: 'Paradicsomos bruschetta',
     prepTime: 12,
     servings: 4,
-    category: 'Előétel',
+    category: ['Előétel', 'Vegán'],
+    isVegan: true,
+    allergens: ['Glutén'],
     description: 'Fokhagymás pirítóson, balzsamecettel.',
     imageUrl: 'https://images.unsplash.com/photo-1572695157363-bc31c5dd3386?auto=format&fit=crop&w=800&q=80',
     ingredients: [
@@ -267,7 +291,9 @@ export const sampleRecipes: SampleRecipe[] = [
     title: 'Klasszikus karbonára',
     prepTime: 22,
     servings: 2,
-    category: 'Tészta',
+    category: ['Tészta'],
+    isVegan: false,
+    allergens: ['Glutén', 'Tojás', 'Tej'],
     description: 'Tojás, pecorino, guanciale – krémes és gyors.',
     imageUrl: 'https://images.unsplash.com/photo-1612874742237-6526221588e3?auto=format&fit=crop&w=800&q=80',
     ingredients: [

@@ -4,18 +4,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 
-interface Recipe {
-  id: string;
-  title: string;
-  description: string;
-  imageUrl: string;
-  prepTime: number;
-  servings: number;
-  category: string;
-}
+import { SampleRecipe } from '../data/sampleRecipes';
 
 interface RecipeCardProps {
-  recipe: Recipe;
+  recipe: SampleRecipe;
   index?: number;
 }
 
@@ -85,7 +77,7 @@ export default function RecipeCard({ recipe, index = 0 }: RecipeCardProps) {
           {/* Floating Category Badge */}
           <div className="absolute top-4 left-4 z-20">
             <span className="px-3 py-1.5 text-xs font-bold tracking-wide text-white uppercase bg-white/20 backdrop-blur-md border border-white/30 rounded-full shadow-sm">
-              {recipe.category}
+              {Array.isArray(recipe.category) ? recipe.category[0] : recipe.category}
             </span>
           </div>
 

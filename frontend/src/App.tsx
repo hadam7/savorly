@@ -1,17 +1,39 @@
 import { Route, Routes, useLocation } from 'react-router-dom';
 import { Plus, ArrowRight, Timer, BookOpen } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
 import Login from './views/Login';
 import Register from './views/Register';
 import Profile from './views/Profile';
 import RecipeDetail from './views/RecipeDetail';
+import CreateRecipe from './views/CreateRecipe';
 import RecipeCard from './components/RecipeCard';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Footer from './components/Footer';
 import { sampleRecipes } from './data/sampleRecipes';
+import { useAuth } from './hooks/useAuth';
 
 function Home() {
+  const { user } = useAuth();
+  const [allRecipes, setAllRecipes] = useState(sampleRecipes);
+
+  useEffect(() => {
+    if (user) {
+      const savedRecipes = localStorage.getItem(`savorly_user_recipes_${user.userName}`);
+      if (savedRecipes) {
+        try {
+          const userRecipes = JSON.parse(savedRecipes);
+          setAllRecipes([...userRecipes, ...sampleRecipes]);
+        } catch (e) {
+          console.error('Failed to parse user recipes', e);
+        }
+      }
+    } else {
+      setAllRecipes(sampleRecipes);
+    }
+  }, [user]);
+
   return (
     <>
       <Hero />
@@ -28,7 +50,7 @@ function Home() {
         </div>
 
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {sampleRecipes.map((r, idx) => (
+          {allRecipes.map((r, idx) => (
             <RecipeCard key={r.id} recipe={r} index={idx} />
           ))}
         </div>
@@ -170,6 +192,7 @@ function AppShell() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/create-recipe" element={<CreateRecipe />} />
         </Routes>
       </main>
 

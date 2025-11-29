@@ -8,7 +8,21 @@ export default function RecipeDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const recipe = sampleRecipes.find((r) => r.id === id);
+
+  // Find recipe in sampleRecipes or localStorage
+  let recipe = sampleRecipes.find((r) => r.id === id);
+
+  if (!recipe && user) {
+    const savedRecipes = localStorage.getItem(`savorly_user_recipes_${user.userName}`);
+    if (savedRecipes) {
+      try {
+        const userRecipes = JSON.parse(savedRecipes);
+        recipe = userRecipes.find((r: any) => r.id === id);
+      } catch (e) {
+        console.error('Failed to parse user recipes', e);
+      }
+    }
+  }
   const [isFavorite, setIsFavorite] = useState(false);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -141,16 +155,43 @@ export default function RecipeDetail() {
               </div>
             </div>
 
-            <button
-              onClick={handleToggleFavorite}
-              className={`flex items-center gap-2 rounded-full px-6 py-3 font-semibold transition-all duration-300 ${isFavorite
+            <div className="flex flex-col items-end gap-4">
+              <button
+                onClick={handleToggleFavorite}
+                className={`flex items-center gap-2 rounded-full px-6 py-2.5 font-semibold transition-all duration-300 ${isFavorite
                   ? 'bg-red-50 text-red-500'
                   : 'bg-slate-900 text-white hover:bg-slate-800 hover:shadow-lg hover:-translate-y-0.5'
-                }`}
-            >
-              <Heart size={20} className={isFavorite ? 'fill-current' : ''} />
-              {isFavorite ? 'Mentve' : 'Mentés kedvencekhez'}
-            </button>
+                  }`}
+              >
+                <Heart size={18} className={isFavorite ? 'fill-current' : ''} />
+                {isFavorite ? 'Mentve' : 'Mentés'}
+              </button>
+
+              <div className="flex flex-wrap justify-end gap-2">
+                {recipe.isVegan && (
+                  <span className="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
+                    Vegán
+                  </span>
+                )}
+                {recipe.allergens && recipe.allergens.map(allergen => (
+                  <span key={allergen} className="inline-flex items-center rounded-full bg-[#BD95A4] px-3 py-1 text-xs font-medium text-white">
+                    {allergen}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="mb-8 flex flex-wrap gap-2">
+            {Array.isArray(recipe.category) ? recipe.category.map(cat => (
+              <span key={cat} className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-600">
+                {cat}
+              </span>
+            )) : (
+              <span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-600">
+                {recipe.category}
+              </span>
+            )}
           </div>
 
           {/* Description */}
