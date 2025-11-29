@@ -1,11 +1,31 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { User, Heart, LogOut } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { motion } from 'framer-motion';
+import { sampleRecipes } from '../data/sampleRecipes';
+import RecipeCard from '../components/RecipeCard';
 
 export default function Profile() {
     const { user, logout } = useAuth();
     const [activeTab, setActiveTab] = useState<'data' | 'likes'>('data');
+    const [likedRecipes, setLikedRecipes] = useState<typeof sampleRecipes>([]);
+
+    useEffect(() => {
+        if (user && activeTab === 'likes') {
+            const savedFavorites = localStorage.getItem(`savorly_favorites_${user.userName}`);
+            if (savedFavorites) {
+                try {
+                    const favoriteIds = JSON.parse(savedFavorites);
+                    const recipes = sampleRecipes.filter(r => favoriteIds.includes(r.id));
+                    setLikedRecipes(recipes);
+                } catch (e) {
+                    console.error('Failed to parse favorites', e);
+                }
+            } else {
+                setLikedRecipes([]);
+            }
+        }
+    }, [user, activeTab]);
 
     if (!user) {
         return (
@@ -96,13 +116,23 @@ export default function Profile() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                     >
-                        <div className="flex flex-col items-center justify-center py-20 text-center">
-                            <div className="mb-4 rounded-full bg-slate-100 p-4 text-slate-400">
-                                <Heart size={32} />
+                        {likedRecipes.length > 0 ? (
+                            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                                {likedRecipes.map((recipe, idx) => (
+                                    <div key={recipe.id} className="h-[400px]">
+                                        <RecipeCard recipe={recipe} index={idx} />
+                                    </div>
+                                ))}
                             </div>
-                            <h3 className="text-lg font-semibold text-slate-900">Még nincsenek kedvelt receptek</h3>
-                            <p className="mt-2 text-slate-500">Böngéssz a receptek között és mentsd el a kedvenceidet!</p>
-                        </div>
+                        ) : (
+                            <div className="flex flex-col items-center justify-center py-20 text-center">
+                                <div className="mb-4 rounded-full bg-slate-100 p-4 text-slate-400">
+                                    <Heart size={32} />
+                                </div>
+                                <h3 className="text-lg font-semibold text-slate-900">Még nincsenek kedvelt receptek</h3>
+                                <p className="mt-2 text-slate-500">Böngéssz a receptek között és mentsd el a kedvenceidet!</p>
+                            </div>
+                        )}
                     </motion.div>
                 )}
             </div>

@@ -1,6 +1,8 @@
 import { Clock, Users, Heart, ArrowUpRight } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useAuth } from '../hooks/useAuth';
 
 interface Recipe {
   id: string;
@@ -18,6 +20,50 @@ interface RecipeCardProps {
 }
 
 export default function RecipeCard({ recipe, index = 0 }: RecipeCardProps) {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      const savedFavorites = localStorage.getItem(`savorly_favorites_${user.userName}`);
+      if (savedFavorites) {
+        try {
+          const favorites = JSON.parse(savedFavorites);
+          setIsFavorite(favorites.includes(recipe.id));
+        } catch (e) {
+          console.error('Failed to parse favorites', e);
+        }
+      }
+    } else {
+      setIsFavorite(false);
+    }
+  }, [user, recipe.id]);
+
+  const handleToggleFavorite = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent navigation to recipe detail
+    e.stopPropagation();
+
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    const savedFavorites = localStorage.getItem(`savorly_favorites_${user.userName}`);
+    let favorites: string[] = savedFavorites ? JSON.parse(savedFavorites) : [];
+
+    if (isFavorite) {
+      favorites = favorites.filter((favId) => favId !== recipe.id);
+    } else {
+      if (!favorites.includes(recipe.id)) {
+        favorites.push(recipe.id);
+      }
+    }
+
+    localStorage.setItem(`savorly_favorites_${user.userName}`, JSON.stringify(favorites));
+    setIsFavorite(!isFavorite);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -44,8 +90,14 @@ export default function RecipeCard({ recipe, index = 0 }: RecipeCardProps) {
           </div>
 
           {/* Quick Action Button */}
-          <button className="absolute top-4 right-4 z-20 p-2.5 bg-white/90 backdrop-blur-sm rounded-full text-slate-400 hover:text-red-500 hover:bg-white transition-all duration-300 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 shadow-lg">
-            <Heart size={18} className="transition-transform active:scale-90" />
+          <button
+            onClick={handleToggleFavorite}
+            className={`absolute top-4 right-4 z-20 p-2.5 backdrop-blur-sm rounded-full transition-all duration-300 translate-y-2 group-hover:translate-y-0 shadow-lg ${isFavorite
+              ? 'bg-red-50 text-red-500 opacity-100'
+              : 'bg-white/90 text-slate-400 hover:text-red-500 hover:bg-white opacity-0 group-hover:opacity-100'
+              }`}
+          >
+            <Heart size={18} className={`transition-transform active:scale-90 ${isFavorite ? 'fill-current' : ''}`} />
           </button>
         </div>
 

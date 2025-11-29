@@ -1,4 +1,4 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { sampleRecipes } from '../data/sampleRecipes';
 import { ArrowLeft, Clock, Users, Heart, Check } from 'lucide-react';
@@ -6,11 +6,52 @@ import { useAuth } from '../hooks/useAuth';
 
 export default function RecipeDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const recipe = sampleRecipes.find((r) => r.id === id);
   const [isFavorite, setIsFavorite] = useState(false);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+
+  // Load favorites
+  useEffect(() => {
+    if (user && id) {
+      const savedFavorites = localStorage.getItem(`savorly_favorites_${user.userName}`);
+      if (savedFavorites) {
+        try {
+          const favorites = JSON.parse(savedFavorites);
+          setIsFavorite(favorites.includes(id));
+        } catch (e) {
+          console.error('Failed to parse favorites', e);
+        }
+      }
+    } else {
+      setIsFavorite(false);
+    }
+  }, [user, id]);
+
+  const handleToggleFavorite = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    if (!id) return;
+
+    const savedFavorites = localStorage.getItem(`savorly_favorites_${user.userName}`);
+    let favorites: string[] = savedFavorites ? JSON.parse(savedFavorites) : [];
+
+    if (isFavorite) {
+      favorites = favorites.filter((favId) => favId !== id);
+    } else {
+      if (!favorites.includes(id)) {
+        favorites.push(id);
+      }
+    }
+
+    localStorage.setItem(`savorly_favorites_${user.userName}`, JSON.stringify(favorites));
+    setIsFavorite(!isFavorite);
+  };
 
   // Load progress on mount or when user/recipe changes
   useEffect(() => {
@@ -101,10 +142,10 @@ export default function RecipeDetail() {
             </div>
 
             <button
-              onClick={() => setIsFavorite(!isFavorite)}
+              onClick={handleToggleFavorite}
               className={`flex items-center gap-2 rounded-full px-6 py-3 font-semibold transition-all duration-300 ${isFavorite
-                ? 'bg-red-50 text-red-500'
-                : 'bg-slate-900 text-white hover:bg-slate-800 hover:shadow-lg hover:-translate-y-0.5'
+                  ? 'bg-red-50 text-red-500'
+                  : 'bg-slate-900 text-white hover:bg-slate-800 hover:shadow-lg hover:-translate-y-0.5'
                 }`}
             >
               <Heart size={20} className={isFavorite ? 'fill-current' : ''} />
