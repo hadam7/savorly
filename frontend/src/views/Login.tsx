@@ -68,7 +68,7 @@ export default function Login() {
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <div className="space-y-1 text-sm">
               <label className="block text-slate-700 flex items-center gap-2">
-                <User size={14} className="text-[#A1836C]" /> Felhasználónév
+                <User size={14} className="text-[#A1836C]" /> Felhasználónév vagy Email
               </label>
               <input
                 type="text"
