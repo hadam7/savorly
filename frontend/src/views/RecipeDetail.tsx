@@ -1,12 +1,48 @@
 import { useParams, Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { sampleRecipes } from '../data/sampleRecipes';
-import { ArrowLeft, Clock, Users, Heart } from 'lucide-react';
+import { ArrowLeft, Clock, Users, Heart, Check } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
 
 export default function RecipeDetail() {
   const { id } = useParams();
+  const { user } = useAuth();
   const recipe = sampleRecipes.find((r) => r.id === id);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Load progress on mount or when user/recipe changes
+  useEffect(() => {
+    if (user && id) {
+      const savedProgress = localStorage.getItem(`savorly_progress_${user.userName}_${id}`);
+      if (savedProgress) {
+        try {
+          setCompletedSteps(JSON.parse(savedProgress));
+        } catch (e) {
+          console.error('Failed to parse saved progress', e);
+        }
+      } else {
+        setCompletedSteps([]);
+      }
+      setIsLoaded(true);
+    }
+  }, [user, id]);
+
+  // Save progress whenever it changes
+  useEffect(() => {
+    if (isLoaded && user && id) {
+      localStorage.setItem(`savorly_progress_${user.userName}_${id}`, JSON.stringify(completedSteps));
+    }
+  }, [completedSteps, user, id, isLoaded]);
+
+  const toggleStep = (index: number) => {
+    setCompletedSteps((prev) =>
+      prev.includes(index)
+        ? prev.filter((i) => i !== index)
+        : [...prev, index]
+    );
+  };
 
   if (!recipe) {
     return (
@@ -67,8 +103,8 @@ export default function RecipeDetail() {
             <button
               onClick={() => setIsFavorite(!isFavorite)}
               className={`flex items-center gap-2 rounded-full px-6 py-3 font-semibold transition-all duration-300 ${isFavorite
-                  ? 'bg-red-50 text-red-500'
-                  : 'bg-slate-900 text-white hover:bg-slate-800 hover:shadow-lg hover:-translate-y-0.5'
+                ? 'bg-red-50 text-red-500'
+                : 'bg-slate-900 text-white hover:bg-slate-800 hover:shadow-lg hover:-translate-y-0.5'
                 }`}
             >
               <Heart size={20} className={isFavorite ? 'fill-current' : ''} />
@@ -110,16 +146,34 @@ export default function RecipeDetail() {
                 Elkészítés
               </h3>
               <div className="space-y-8">
-                {recipe.instructions.map((step, idx) => (
-                  <div key={idx} className="group relative pl-8">
-                    <div className="absolute left-0 top-0 flex h-8 w-8 -translate-x-1/2 items-center justify-center rounded-full border-2 border-white bg-slate-100 font-bold text-slate-400 shadow-sm transition-colors group-hover:bg-[#BD95A4] group-hover:text-white">
-                      {idx + 1}
+                {recipe.instructions.map((step, idx) => {
+                  const isCompleted = completedSteps.includes(idx);
+                  return (
+                    <div
+                      key={idx}
+                      className={`group relative pl-8 transition-all duration-300 ${isCompleted ? 'opacity-60' : ''}`}
+                    >
+                      <button
+                        onClick={() => toggleStep(idx)}
+                        className={`absolute left-0 top-0 flex h-8 w-8 -translate-x-1/2 items-center justify-center rounded-full border-2 font-bold shadow-sm transition-all duration-300 hover:scale-110 ${isCompleted
+                          ? 'border-[#BD95A4] bg-[#BD95A4] text-white'
+                          : 'border-white bg-slate-100 text-slate-400 group-hover:bg-[#BD95A4] group-hover:text-white'
+                          }`}
+                      >
+                        {isCompleted ? <Check size={16} strokeWidth={3} /> : idx + 1}
+                      </button>
+                      <div className="border-l-2 border-slate-100 pl-8 pb-8 last:border-0 last:pb-0">
+                        <p
+                          className={`text-lg leading-relaxed transition-all duration-300 cursor-pointer ${isCompleted ? 'text-slate-400 line-through' : 'text-slate-700'
+                            }`}
+                          onClick={() => toggleStep(idx)}
+                        >
+                          {step}
+                        </p>
+                      </div>
                     </div>
-                    <div className="border-l-2 border-slate-100 pl-8 pb-8 last:border-0 last:pb-0">
-                      <p className="text-lg leading-relaxed text-slate-700">{step}</p>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
