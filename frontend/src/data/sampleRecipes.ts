@@ -10,6 +10,8 @@ export type SampleRecipe = {
   allergens: string[];
   ingredients: string[];
   instructions: string[];
+  createdAt?: string;
+  likes?: number;
 };
 
 export const sampleRecipes: SampleRecipe[] = [
@@ -37,6 +39,8 @@ export const sampleRecipes: SampleRecipe[] = [
       'Pár percig forraljuk, amíg a szósz besűrűsödik.',
       'Friss petrezselyemmel megszórva tálaljuk.',
     ],
+    createdAt: '2023-11-01T10:00:00Z',
+    likes: 120,
   },
   {
     id: '2',
@@ -62,6 +66,8 @@ export const sampleRecipes: SampleRecipe[] = [
       'Egy tálban összekeverjük a tésztát a zöldségekkel és a sajttal.',
       'Meglocsoljuk olívaolajjal, megszórjuk oregánóval, és hűtve tálaljuk.',
     ],
+    createdAt: '2023-10-25T14:30:00Z',
+    likes: 85,
   },
   {
     id: '3',
@@ -87,6 +93,8 @@ export const sampleRecipes: SampleRecipe[] = [
       'Sütőpapírral bélelt tepsibe öntjük.',
       '180 fokon kb. 20-25 percig sütjük.',
     ],
+    createdAt: '2023-11-05T09:15:00Z',
+    likes: 200,
   },
   {
     id: '4',
@@ -112,6 +120,8 @@ export const sampleRecipes: SampleRecipe[] = [
       'Sózzuk, borsozzuk, és friss mentával ízesítjük.',
       'Pirított magvakkal tálaljuk.',
     ],
+    createdAt: '2023-10-20T11:45:00Z',
+    likes: 65,
   },
   {
     id: '5',
@@ -137,6 +147,8 @@ export const sampleRecipes: SampleRecipe[] = [
       'Belekeverjük a kifőtt gnocchit.',
       'Reszelt parmezánnal megszórva tálaljuk.',
     ],
+    createdAt: '2023-11-08T18:20:00Z',
+    likes: 95,
   },
   {
     id: '6',
@@ -162,13 +174,15 @@ export const sampleRecipes: SampleRecipe[] = [
       'Ha szükséges, kevés vízzel hígítjuk.',
       'Főtt rizzsel tálaljuk.',
     ],
+    createdAt: '2023-10-15T13:10:00Z',
+    likes: 150,
   },
   {
     id: '7',
     title: 'Avokádós toast buggyantott tojással',
     prepTime: 10,
     servings: 1,
-    category: 'Reggeli',
+    category: ['Reggeli'],
     isVegan: false,
     allergens: ['Glutén', 'Tojás'],
     description: 'Gyors, tápláló indítás a naphoz.',
@@ -187,6 +201,8 @@ export const sampleRecipes: SampleRecipe[] = [
       'A pirítósra kenjük az avokádót, ráhelyezzük a tojást.',
       'Chili pehellyel megszórva tálaljuk.',
     ],
+    createdAt: '2023-11-12T08:00:00Z',
+    likes: 110,
   },
   {
     id: '8',
@@ -211,6 +227,8 @@ export const sampleRecipes: SampleRecipe[] = [
       'A tahinit kikeverjük kevés vízzel és citromlével.',
       'A sült karfiolt a tahini szósszal meglocsolva tálaljuk.',
     ],
+    createdAt: '2023-10-30T16:40:00Z',
+    likes: 78,
   },
   {
     id: '9',
@@ -236,6 +254,8 @@ export const sampleRecipes: SampleRecipe[] = [
       'Kivajazott tepsibe öntjük.',
       '180 fokon 30 percig sütjük.',
     ],
+    createdAt: '2023-11-02T15:55:00Z',
+    likes: 130,
   },
   {
     id: '10',
@@ -261,6 +281,8 @@ export const sampleRecipes: SampleRecipe[] = [
       'Meglocsoljuk szójaszósszal.',
       'Szezámmaggal megszórva tálaljuk.',
     ],
+    createdAt: '2023-10-28T19:25:00Z',
+    likes: 92,
   },
   {
     id: '11',
@@ -285,6 +307,8 @@ export const sampleRecipes: SampleRecipe[] = [
       'A keveréket a pirítósra halmozzuk.',
       'Azonnal tálaljuk.',
     ],
+    createdAt: '2023-11-07T17:05:00Z',
+    likes: 105,
   },
   {
     id: '12',
@@ -310,5 +334,7 @@ export const sampleRecipes: SampleRecipe[] = [
       'A kifőtt tésztát a szalonnához adjuk, majd levesszük a tűzről.',
       'Belekeverjük a tojásos masszát (a tészta hője főzi meg a tojást).',
     ],
+    createdAt: '2023-11-10T12:00:00Z',
+    likes: 156,
   },
 ];

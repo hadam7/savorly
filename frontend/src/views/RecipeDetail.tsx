@@ -1,7 +1,7 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { sampleRecipes } from '../data/sampleRecipes';
-import { ArrowLeft, Clock, Users, Heart, Check } from 'lucide-react';
+import { ArrowLeft, Clock, Users, Heart, Check, Trash2, Edit } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
 export default function RecipeDetail() {
@@ -10,7 +10,7 @@ export default function RecipeDetail() {
   const { user } = useAuth();
 
   // Find recipe in sampleRecipes or localStorage
-  let recipe = sampleRecipes.find((r) => r.id === id);
+  let recipe: any = sampleRecipes.find((r) => r.id === id);
 
   if (!recipe && user) {
     const savedRecipes = localStorage.getItem(`savorly_user_recipes_${user.userName}`);
@@ -67,6 +67,18 @@ export default function RecipeDetail() {
     setIsFavorite(!isFavorite);
   };
 
+  const handleDelete = () => {
+    if (window.confirm('Biztosan törölni szeretnéd ezt a receptet?')) {
+      const savedRecipes = localStorage.getItem(`savorly_user_recipes_${user?.userName}`);
+      if (savedRecipes) {
+        const userRecipes = JSON.parse(savedRecipes);
+        const updatedRecipes = userRecipes.filter((r: any) => r.id !== id);
+        localStorage.setItem(`savorly_user_recipes_${user?.userName}`, JSON.stringify(updatedRecipes));
+        navigate('/');
+      }
+    }
+  };
+
   // Load progress on mount or when user/recipe changes
   useEffect(() => {
     if (user && id) {
@@ -109,6 +121,8 @@ export default function RecipeDetail() {
       </div>
     );
   }
+
+  const isOwner = user && recipe.author === user.userName;
 
   return (
     <section className="min-h-screen pb-20">
@@ -156,16 +170,36 @@ export default function RecipeDetail() {
             </div>
 
             <div className="flex flex-col items-end gap-4">
-              <button
-                onClick={handleToggleFavorite}
-                className={`flex items-center gap-2 rounded-full px-6 py-2.5 font-semibold transition-all duration-300 ${isFavorite
-                  ? 'bg-red-50 text-red-500'
-                  : 'bg-slate-900 text-white hover:bg-slate-800 hover:shadow-lg hover:-translate-y-0.5'
-                  }`}
-              >
-                <Heart size={18} className={isFavorite ? 'fill-current' : ''} />
-                {isFavorite ? 'Mentve' : 'Mentés'}
-              </button>
+              <div className="flex gap-3">
+                {isOwner && (
+                  <>
+                    <button
+                      onClick={() => navigate(`/edit-recipe/${id}`)}
+                      className="flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2.5 font-semibold text-slate-600 transition-all duration-300 hover:bg-slate-200 hover:text-slate-900"
+                    >
+                      <Edit size={18} />
+                      Szerkesztés
+                    </button>
+                    <button
+                      onClick={handleDelete}
+                      className="flex items-center gap-2 rounded-full bg-red-50 px-4 py-2.5 font-semibold text-red-500 transition-all duration-300 hover:bg-red-100 hover:text-red-600"
+                    >
+                      <Trash2 size={18} />
+                      Törlés
+                    </button>
+                  </>
+                )}
+                <button
+                  onClick={handleToggleFavorite}
+                  className={`flex items-center gap-2 rounded-full px-6 py-2.5 font-semibold transition-all duration-300 ${isFavorite
+                    ? 'bg-red-50 text-red-500'
+                    : 'bg-slate-900 text-white hover:bg-slate-800 hover:shadow-lg hover:-translate-y-0.5'
+                    }`}
+                >
+                  <Heart size={18} className={isFavorite ? 'fill-current' : ''} />
+                  {isFavorite ? 'Mentve' : 'Mentés'}
+                </button>
+              </div>
 
               <div className="flex flex-wrap justify-end gap-2">
                 {recipe.isVegan && (
@@ -173,7 +207,7 @@ export default function RecipeDetail() {
                     Vegán
                   </span>
                 )}
-                {recipe.allergens && recipe.allergens.map(allergen => (
+                {recipe.allergens && recipe.allergens.map((allergen: string) => (
                   <span key={allergen} className="inline-flex items-center rounded-full bg-[#BD95A4] px-3 py-1 text-xs font-medium text-white">
                     {allergen}
                   </span>
@@ -183,7 +217,7 @@ export default function RecipeDetail() {
           </div>
 
           <div className="mb-8 flex flex-wrap gap-2">
-            {Array.isArray(recipe.category) ? recipe.category.map(cat => (
+            {Array.isArray(recipe.category) ? recipe.category.map((cat: string) => (
               <span key={cat} className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-600">
                 {cat}
               </span>
@@ -210,7 +244,7 @@ export default function RecipeDetail() {
                 Hozzávalók
               </h3>
               <ul className="space-y-3">
-                {recipe.ingredients.map((ingredient, idx) => (
+                {recipe.ingredients.map((ingredient: string, idx: number) => (
                   <li key={idx} className="flex items-start gap-3 rounded-xl bg-slate-50 p-3 transition-colors hover:bg-slate-100">
                     <div className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#BD95A4]" />
                     <span className="text-slate-700">{ingredient}</span>
@@ -228,7 +262,7 @@ export default function RecipeDetail() {
                 Elkészítés
               </h3>
               <div className="space-y-8">
-                {recipe.instructions.map((step, idx) => {
+                {recipe.instructions.map((step: string, idx: number) => {
                   const isCompleted = completedSteps.includes(idx);
                   return (
                     <div

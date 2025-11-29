@@ -1,10 +1,11 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { Plus, Minus, Upload, Clock, Users, Save, ArrowLeft } from 'lucide-react';
 
 export default function CreateRecipe() {
     const navigate = useNavigate();
+    const { id } = useParams();
     const { user } = useAuth();
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
@@ -18,6 +19,27 @@ export default function CreateRecipe() {
 
     const availableCategories = ['Reggeli', 'Ebéd', 'Vacsora', 'Desszert', 'Leves', 'Főétel', 'Egytálétel', 'Könnyű', 'Vegetáriánus', 'Vegán', 'Indiai', 'Olasz', 'Előétel', 'Tészta'];
     const availableAllergens = ['Glutén', 'Tej', 'Tojás', 'Mogyoró', 'Szója', 'Hal', 'Szezámmag', 'Diófélék', 'Zeller', 'Mustár'];
+
+    useEffect(() => {
+        if (id && user) {
+            const savedRecipes = localStorage.getItem(`savorly_user_recipes_${user.userName}`);
+            if (savedRecipes) {
+                const userRecipes = JSON.parse(savedRecipes);
+                const recipeToEdit = userRecipes.find((r: any) => r.id === id);
+                if (recipeToEdit) {
+                    setTitle(recipeToEdit.title);
+                    setDescription(recipeToEdit.description);
+                    setImageUrl(recipeToEdit.imageUrl);
+                    setPrepTime(recipeToEdit.prepTime.toString());
+                    setServings(recipeToEdit.servings.toString());
+                    setCategories(recipeToEdit.category || []);
+                    setSelectedAllergens(recipeToEdit.allergens || []);
+                    setIngredients(recipeToEdit.ingredients || ['']);
+                    setInstructions(recipeToEdit.instructions || ['']);
+                }
+            }
+        }
+    }, [id, user]);
 
     if (!user) {
         navigate('/login');
@@ -70,8 +92,8 @@ export default function CreateRecipe() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        const newRecipe = {
-            id: `user-${Date.now()}`,
+        const recipeData = {
+            id: id || `user-${Date.now()}`,
             title,
             description,
             imageUrl: imageUrl || 'https://images.unsplash.com/photo-1495521821757-a1efb6729352?auto=format&fit=crop&w=800&q=80',
@@ -82,15 +104,25 @@ export default function CreateRecipe() {
             allergens: selectedAllergens,
             ingredients: ingredients.filter(i => i.trim() !== ''),
             instructions: instructions.filter(i => i.trim() !== ''),
-            author: user.userName
+            author: user.userName,
+            createdAt: id ? undefined : new Date().toISOString(), // Keep original date if editing
+            likes: 0
         };
 
         const savedRecipes = localStorage.getItem(`savorly_user_recipes_${user.userName}`);
-        const userRecipes = savedRecipes ? JSON.parse(savedRecipes) : [];
-        userRecipes.push(newRecipe);
-        localStorage.setItem(`savorly_user_recipes_${user.userName}`, JSON.stringify(userRecipes));
+        let userRecipes = savedRecipes ? JSON.parse(savedRecipes) : [];
 
-        navigate('/');
+        if (id) {
+            // Update existing
+            userRecipes = userRecipes.map((r: any) => r.id === id ? { ...r, ...recipeData, createdAt: r.createdAt } : r);
+            localStorage.setItem(`savorly_user_recipes_${user.userName}`, JSON.stringify(userRecipes));
+            navigate(`/recipe/${id}`);
+        } else {
+            // Create new
+            userRecipes.push(recipeData);
+            localStorage.setItem(`savorly_user_recipes_${user.userName}`, JSON.stringify(userRecipes));
+            navigate('/');
+        }
     };
 
     return (
@@ -104,7 +136,7 @@ export default function CreateRecipe() {
                 </button>
 
                 <div className="rounded-3xl bg-white p-8 shadow-xl shadow-slate-200/20 md:p-12">
-                    <h1 className="mb-8 text-3xl font-bold text-slate-900">Új recept létrehozása</h1>
+                    <h1 className="mb-8 text-3xl font-bold text-slate-900">{id ? 'Recept szerkesztése' : 'Új recept létrehozása'}</h1>
 
                     <form onSubmit={handleSubmit} className="space-y-8">
                         {/* Basic Info */}
