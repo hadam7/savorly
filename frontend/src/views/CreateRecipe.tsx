@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { createRecipe, updateRecipe, fetchRecipeById } from '../api';
+import { createRecipe, updateRecipe, fetchRecipeById, fetchCategories, CategoryDto } from '../api';
 import { Plus, Minus, Upload, Clock, Users, Save, ArrowLeft } from 'lucide-react';
 
 export default function CreateRecipe() {
@@ -13,35 +13,39 @@ export default function CreateRecipe() {
     const [imageUrl, setImageUrl] = useState('');
     const [prepTime, setPrepTime] = useState('');
     const [servings, setServings] = useState('');
-    const [categories, setCategories] = useState<string[]>([]);
+    const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
+    const [availableCategories, setAvailableCategories] = useState<CategoryDto[]>([]);
     const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
     const [ingredients, setIngredients] = useState<string[]>(['']);
     const [instructions, setInstructions] = useState<string[]>(['']);
 
-    const availableCategories = ['Reggeli', 'Ebéd', 'Vacsora', 'Desszert', 'Leves', 'Főétel', 'Egytálétel', 'Könnyű', 'Vegetáriánus', 'Vegán', 'Indiai', 'Olasz', 'Előétel', 'Tészta'];
     const availableAllergens = ['Glutén', 'Tej', 'Tojás', 'Mogyoró', 'Szója', 'Hal', 'Szezámmag', 'Diófélék', 'Zeller', 'Mustár'];
 
     useEffect(() => {
-        if (id && user) {
-            const loadRecipe = async () => {
-                try {
+        const loadData = async () => {
+            try {
+                const cats = await fetchCategories();
+                setAvailableCategories(cats);
+
+                if (id && user) {
                     const recipe = await fetchRecipeById(parseInt(id));
                     setTitle(recipe.title);
                     setDescription(recipe.description || '');
                     setImageUrl(recipe.imageUrl || '');
                     setPrepTime(recipe.prepTimeMinutes?.toString() || '');
                     setServings(recipe.servings.toString());
-                    // setCategories(recipe.category || []); // Backend returns IDs, we need names. Skipping for now as noted.
+
+                    setSelectedCategoryIds(recipe.categoryIds || []);
                     setSelectedAllergens(recipe.allergens || []);
                     setIngredients(recipe.ingredients.length > 0 ? recipe.ingredients : ['']);
                     setInstructions(recipe.instructions.length > 0 ? recipe.instructions : ['']);
-                } catch (error) {
-                    console.error('Failed to load recipe', error);
-                    navigate('/');
                 }
-            };
-            loadRecipe();
-        }
+            } catch (error) {
+                console.error('Failed to load data', error);
+                if (id) navigate('/');
+            }
+        };
+        loadData();
     }, [id, user, navigate]);
 
     if (!user) {
@@ -80,9 +84,9 @@ export default function CreateRecipe() {
         }
     };
 
-    const toggleCategory = (cat: string) => {
-        setCategories(prev =>
-            prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
+    const toggleCategory = (catId: number) => {
+        setSelectedCategoryIds(prev =>
+            prev.includes(catId) ? prev.filter(id => id !== catId) : [...prev, catId]
         );
     };
 
@@ -109,17 +113,8 @@ export default function CreateRecipe() {
             imageUrl: imageUrl || 'https://images.unsplash.com/photo-1495521821757-a1efb6729352?auto=format&fit=crop&w=800&q=80',
             prepTimeMinutes: parseInt(prepTime) || 0,
             servings: parseInt(servings) || 1,
-            categoryIds: [], // We need to map category names to IDs. For now sending empty or we need to fetch categories first.
-            // Ideally we should fetch categories from backend and map them. 
-            // For this iteration, let's assume we send category names in a separate field if backend supported it, 
-            // or we need to implement category fetching. 
-            // The backend expects CategoryIds. 
-            // Let's temporarily skip category mapping or implement a quick lookup if possible.
-            // Since we don't have category IDs on frontend, let's just send empty for now and fix later or 
-            // update backend to accept names. 
-            // Actually, the backend creates categories if they don't exist? No, it expects IDs.
-            // Let's just send empty list for now to unblock.
-            isVegan: categories.includes('Vegán'),
+            categoryIds: selectedCategoryIds,
+            isVegan: selectedCategoryIds.some(id => availableCategories.find(c => c.id === id)?.name === 'Vegán'),
             allergens: selectedAllergens,
             ingredients: ingredients.filter(i => i.trim() !== ''),
             instructions: instructions.filter(i => i.trim() !== ''),
@@ -221,15 +216,15 @@ export default function CreateRecipe() {
                                         <div className="flex flex-wrap gap-2">
                                             {availableCategories.map(cat => (
                                                 <button
-                                                    key={cat}
+                                                    key={cat.id}
                                                     type="button"
-                                                    onClick={() => toggleCategory(cat)}
-                                                    className={`rounded-full px-3 py-1 text-sm font-medium transition-colors ${categories.includes(cat)
+                                                    onClick={() => toggleCategory(cat.id)}
+                                                    className={`rounded-full px-3 py-1 text-sm font-medium transition-colors ${selectedCategoryIds.includes(cat.id)
                                                         ? 'bg-[#BD95A4] text-white'
                                                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                                                         }`}
                                                 >
-                                                    {cat}
+                                                    {cat.name}
                                                 </button>
                                             ))}
                                         </div>

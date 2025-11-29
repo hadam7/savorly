@@ -159,6 +159,10 @@ export default function AdminDashboard() {
         u.email.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    const filteredCategories = categories.filter(c =>
+        c.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     if (!user || user.role !== 'Admin') {
         return (
             <div className="flex min-h-screen items-center justify-center">
@@ -176,32 +180,38 @@ export default function AdminDashboard() {
             <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-slate-900">Adminisztrációs Pult</h1>
-                    <p className="text-slate-500">Felhasználók kezelése és jogosultságok.</p>
+                    <p className="text-slate-500">Felhasználók és kategóriák kezelése.</p>
                 </div>
 
-                <div className="flex items-center gap-4">
-                    <button
-                        onClick={() => {
-                            setShowCategories(!showCategories);
-                            if (!showCategories) loadCategories();
-                        }}
-                        className={`px-4 py-2 rounded-xl font-medium transition-colors ${showCategories ? 'bg-[#BD95A4] text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}
-                    >
-                        {showCategories ? 'Felhasználók' : 'Kategóriák kezelése'}
-                    </button>
+                <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex bg-slate-100 p-1 rounded-xl">
+                        <button
+                            onClick={() => setShowCategories(false)}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${!showCategories ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                        >
+                            Felhasználók
+                        </button>
+                        <button
+                            onClick={() => {
+                                setShowCategories(true);
+                                if (categories.length === 0) loadCategories();
+                            }}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${showCategories ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                        >
+                            Kategóriák
+                        </button>
+                    </div>
 
-                    {!showCategories && (
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                            <input
-                                type="text"
-                                placeholder="Keresés..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-10 pr-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-[#BD95A4] focus:ring-1 focus:ring-[#BD95A4]"
-                            />
-                        </div>
-                    )}
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                        <input
+                            type="text"
+                            placeholder={showCategories ? "Keresés a kategóriák között..." : "Keresés a felhasználók között..."}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full sm:w-80 pl-10 pr-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-[#BD95A4] focus:ring-1 focus:ring-[#BD95A4] bg-white"
+                        />
+                    </div>
                 </div>
             </div>
 
@@ -237,13 +247,13 @@ export default function AdminDashboard() {
 
                     {loadingCategories ? (
                         <div className="text-center py-12 text-slate-500">Betöltés...</div>
-                    ) : categories.length === 0 ? (
+                    ) : filteredCategories.length === 0 ? (
                         <div className="text-center py-12 text-slate-500 bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                            Nincsenek még kategóriák. Hozz létre egyet!
+                            {searchQuery ? 'Nincs a keresésnek megfelelő kategória.' : 'Nincsenek még kategóriák. Hozz létre egyet!'}
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                            {categories.map(cat => (
+                            {filteredCategories.map(cat => (
                                 <div key={cat.id} className="flex items-center justify-between p-4 rounded-xl border border-slate-100 bg-slate-50 group hover:border-[#BD95A4]/30 transition-colors">
                                     <span className="font-medium text-slate-700">{cat.name}</span>
                                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
