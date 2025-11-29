@@ -8,6 +8,7 @@ import Register from './views/Register';
 import Profile from './views/Profile';
 import RecipeDetail from './views/RecipeDetail';
 import CreateRecipe from './views/CreateRecipe';
+import AdminDashboard from './views/AdminDashboard';
 import RecipeCard from './components/RecipeCard';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
@@ -392,7 +393,7 @@ function AppShell() {
           <Route path="/" element={<Home />} />
           <Route path="/recipe/:id" element={<RecipeDetail />} />
           <Route path="/recipes" element={<Recipes />} />
-          <Route path="/categories" element={<Categories />} />
+          <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/profile" element={<Profile />} />

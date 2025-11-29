@@ -39,7 +39,7 @@ public class AuthController : ControllerBase
         {
             UserName = request.UserName,
             Email = request.Email,
-            Role = "User"
+            Role = (await _db.Users.CountAsync() == 0) ? "Admin" : "User"
         };
 
         user.PasswordHash = _passwordHasher.HashPassword(user, request.Password);
@@ -64,6 +64,11 @@ public class AuthController : ControllerBase
         if (user == null)
         {
             return Unauthorized("Invalid credentials.");
+        }
+
+        if (!user.IsActive)
+        {
+            return Unauthorized("Account is disabled.");
         }
 
         var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);

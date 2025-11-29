@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -89,6 +90,7 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.EnsureCreated();
+    DbInitializer.Initialize(db);
 }
 
 if (app.Environment.IsDevelopment())
@@ -101,8 +103,42 @@ app.UseHttpsRedirection();
 
 app.UseCors();
 
-// app.UseAuthentication();
-// app.UseAuthorization();
+app.Use(async (context, next) =>
+{
+    var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+    if (authHeader != null && authHeader.StartsWith("Bearer "))
+    {
+        var token = authHeader.Substring("Bearer ".Length).Trim();
+        try
+        {
+            var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
+            var keyBytes = Encoding.UTF8.GetBytes(jwtKey);
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
+                ValidateIssuer = false, // Simplified for now
+                ValidateAudience = false, // Simplified for now
+                ValidIssuer = jwtIssuer,
+                ValidAudience = jwtAudience,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero
+            };
+
+            var principal = handler.ValidateToken(token, validationParameters, out var validatedToken);
+            context.User = principal;
+            Console.WriteLine($"Custom Auth Success: {principal.Identity.Name}, Role: {principal.FindFirst(ClaimTypes.Role)?.Value}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Custom Auth Failed: {ex.Message}");
+        }
+    }
+    await next();
+});
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

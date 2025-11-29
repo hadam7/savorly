@@ -81,6 +81,14 @@ export interface RecipeListItem {
   likes: number;
 }
 
+export type RecipeListItemDto = RecipeListItem;
+
+export interface CategoryDto {
+  id: number;
+  name: string;
+  slug: string;
+}
+
 export interface CreateRecipeDto {
   title: string;
   description?: string;
@@ -145,4 +153,94 @@ export async function deleteRecipe(token: string, id: number): Promise<void> {
     }
   });
   if (!res.ok) throw new Error('Failed to delete recipe');
+}
+
+// User Management API
+export async function fetchUsers(token: string) {
+  const cleanToken = token.replace(/"/g, '').trim();
+  const res = await fetch(`${API_BASE_URL}/users`, {
+    headers: {
+      'Authorization': `Bearer ${cleanToken}`
+    }
+  });
+  if (!res.ok) throw new Error('Failed to fetch users');
+  return res.json();
+}
+
+export async function deleteUser(token: string, id: number) {
+  const cleanToken = token.replace(/"/g, '').trim();
+  const res = await fetch(`${API_BASE_URL}/users/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${cleanToken}`
+    }
+  });
+  if (!res.ok) throw new Error('Failed to delete user');
+}
+
+export async function toggleUserStatus(token: string, id: number) {
+  const cleanToken = token.replace(/"/g, '').trim();
+  const res = await fetch(`${API_BASE_URL}/users/${id}/toggle-status`, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${cleanToken}`
+    }
+  });
+  if (!res.ok) throw new Error('Failed to toggle user status');
+  return res.json();
+}
+
+export async function fetchUserRecipes(token: string, userId: number): Promise<RecipeListItemDto[]> {
+  const cleanToken = token.replace(/"/g, '').trim();
+  const res = await fetch(`${API_BASE_URL}/users/${userId}/recipes`, {
+    headers: {
+      'Authorization': `Bearer ${cleanToken}`
+    }
+  });
+  if (!res.ok) throw new Error('Failed to fetch user recipes');
+  return res.json();
+}
+
+export async function fetchCategories(): Promise<CategoryDto[]> {
+  const res = await fetch(`${API_BASE_URL}/categories`);
+  if (!res.ok) throw new Error('Failed to fetch categories');
+  return res.json();
+}
+
+export async function createCategory(token: string, name: string): Promise<CategoryDto> {
+  const cleanToken = token.replace(/"/g, '').trim();
+  const res = await fetch(`${API_BASE_URL}/categories`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${cleanToken}`
+    },
+    body: JSON.stringify({ name })
+  });
+  if (!res.ok) throw new Error('Failed to create category');
+  return res.json();
+}
+
+export async function deleteCategory(token: string, id: number): Promise<void> {
+  const cleanToken = token.replace(/"/g, '').trim();
+  const res = await fetch(`${API_BASE_URL}/categories/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${cleanToken}`
+    }
+  });
+  if (!res.ok) throw new Error('Failed to delete category');
+}
+
+export async function updateCategory(token: string, id: number, name: string): Promise<void> {
+  const cleanToken = token.replace(/"/g, '').trim();
+  const res = await fetch(`${API_BASE_URL}/categories/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${cleanToken}`
+    },
+    body: JSON.stringify({ name })
+  });
+  if (!res.ok) throw new Error('Failed to update category');
 }

@@ -19,11 +19,9 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpGet]
-    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<CategoryDto>>> GetAll()
     {
-        var cats = await _db.Categories
-            .OrderBy(c => c.Name)
+        var categories = await _db.Categories
             .Select(c => new CategoryDto
             {
                 Id = c.Id,
@@ -32,68 +30,76 @@ public class CategoriesController : ControllerBase
             })
             .ToListAsync();
 
-        return Ok(cats);
-    }
-
-    [HttpGet("{id:int}")]
-    [AllowAnonymous]
-    public async Task<ActionResult<CategoryDto>> GetById(int id)
-    {
-        var c = await _db.Categories.FindAsync(id);
-        if (c == null) return NotFound();
-
-        return Ok(new CategoryDto
-        {
-            Id = c.Id,
-            Name = c.Name,
-            Slug = c.Slug
-        });
+        return Ok(categories);
     }
 
     [HttpPost]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<CategoryDto>> Create(CategoryCreateUpdateDto dto)
     {
-        var c = new Category
+        if (await _db.Categories.AnyAsync(c => c.Name == dto.Name))
+        {
+            return BadRequest("Category already exists.");
+        }
+
+        var slug = dto.Slug;
+        if (string.IsNullOrWhiteSpace(slug))
+        {
+            slug = dto.Name.ToLower().Replace(" ", "-");
+        }
+
+        var category = new Category
         {
             Name = dto.Name,
-            Slug = dto.Slug
+            Slug = slug
         };
 
-        _db.Categories.Add(c);
+        _db.Categories.Add(category);
         await _db.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(GetById), new { id = c.Id }, new CategoryDto
+        return CreatedAtAction(nameof(GetAll), new { id = category.Id }, new CategoryDto
         {
-            Id = c.Id,
-            Name = c.Name,
-            Slug = c.Slug
+            Id = category.Id,
+            Name = category.Name,
+            Slug = category.Slug
         });
-    }
-
-    [HttpPut("{id:int}")]
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Update(int id, CategoryCreateUpdateDto dto)
-    {
-        var c = await _db.Categories.FindAsync(id);
-        if (c == null) return NotFound();
-
-        c.Name = dto.Name;
-        c.Slug = dto.Slug;
-
-        await _db.SaveChangesAsync();
-        return NoContent();
     }
 
     [HttpDelete("{id:int}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int id)
     {
-        var c = await _db.Categories.FindAsync(id);
-        if (c == null) return NotFound();
+        var category = await _db.Categories.FindAsync(id);
+        if (category == null) return NotFound();
 
-        _db.Categories.Remove(c);
+        _db.Categories.Remove(category);
         await _db.SaveChangesAsync();
+        return NoContent();
+    }
+
+    [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Update(int id, CategoryCreateUpdateDto dto)
+    {
+        var category = await _db.Categories.FindAsync(id);
+        if (category == null) return NotFound();
+
+        if (await _db.Categories.AnyAsync(c => c.Name == dto.Name && c.Id != id))
+        {
+            return BadRequest("Category name already exists.");
+        }
+
+        category.Name = dto.Name;
+        
+        var slug = dto.Slug;
+        if (string.IsNullOrWhiteSpace(slug))
+        {
+            slug = dto.Name.ToLower().Replace(" ", "-");
+        }
+        category.Slug = slug;
+
+        await _db.SaveChangesAsync();
+
         return NoContent();
     }
 }

@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { ChefHat, Home, BookOpen, LogIn, UserPlus, Search, User, PlusCircle } from 'lucide-react';
+import { ChefHat, Home, BookOpen, LogIn, UserPlus, Search, User, PlusCircle, Wrench } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 
@@ -8,7 +8,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
-  const { authenticated } = useAuth();
+  const { authenticated, user } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -64,9 +64,11 @@ export default function Navbar() {
         <div className="flex items-center gap-2">
           <NavLink to="/" icon={<Home size={18} />} label="Főoldal" active={isActive('/')} />
           <NavLink to="/recipes" icon={<BookOpen size={18} />} label="Receptek" active={isActive('/recipes')} />
-          <NavLink to="/categories" icon={<Search size={18} />} label="Kategóriák" active={isActive('/categories')} />
           {authenticated && (
             <NavLink to="/create-recipe" icon={<PlusCircle size={18} />} label="Új recept" active={isActive('/create-recipe')} />
+          )}
+          {user?.role === 'Admin' && (
+            <NavLink to="/admin" icon={<Wrench size={18} />} label="Admin Panel" active={isActive('/admin')} />
           )}
         </div>
 

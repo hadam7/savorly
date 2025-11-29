@@ -14,6 +14,7 @@ interface AuthContextType {
     login: (userName: string, password: string) => Promise<void>;
     register: (userName: string, email: string, password: string) => Promise<void>;
     logout: () => void;
+    token: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -109,7 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     return (
-        <AuthContext.Provider value={{ user, authenticated, loading, login, register, logout }}>
+        <AuthContext.Provider value={{ user, authenticated, loading, login, register, logout, token: localStorage.getItem('savorly_token') }}>
             {children}
         </AuthContext.Provider>
     );

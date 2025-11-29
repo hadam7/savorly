@@ -10,5 +10,5 @@ public class CategoryDto
 public class CategoryCreateUpdateDto
 {
     public string Name { get; set; } = default!;
-    public string Slug { get; set; } = default!;
+    public string? Slug { get; set; }
 }

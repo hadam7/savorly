@@ -10,6 +10,7 @@ public class User
     public string Email { get; set; } = default!;
     public string PasswordHash { get; set; } = default!;
     public string Role { get; set; } = "User";
+    public bool IsActive { get; set; } = true;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public ICollection<Recipe> Recipes { get; set; } = new List<Recipe>();
