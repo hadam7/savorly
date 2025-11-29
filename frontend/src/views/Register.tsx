@@ -24,9 +24,9 @@ export default function Register() {
     try {
       await register(userName, email, password);
       navigate('/');
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setError('A regisztráció nem sikerült');
+      setError(err.message || 'A regisztráció nem sikerült');
     }
   };
 

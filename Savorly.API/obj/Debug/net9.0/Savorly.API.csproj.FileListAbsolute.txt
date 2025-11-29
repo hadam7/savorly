@@ -34,6 +34,9 @@ C:\savorly\Savorly.API\bin\Debug\net9.0\Mono.TextTemplating.dll
 C:\savorly\Savorly.API\bin\Debug\net9.0\SQLitePCLRaw.batteries_v2.dll
 C:\savorly\Savorly.API\bin\Debug\net9.0\SQLitePCLRaw.core.dll
 C:\savorly\Savorly.API\bin\Debug\net9.0\SQLitePCLRaw.provider.e_sqlite3.dll
+C:\savorly\Savorly.API\bin\Debug\net9.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\savorly\Savorly.API\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\savorly\Savorly.API\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerUI.dll
 C:\savorly\Savorly.API\bin\Debug\net9.0\System.CodeDom.dll
 C:\savorly\Savorly.API\bin\Debug\net9.0\System.Composition.AttributedModel.dll
 C:\savorly\Savorly.API\bin\Debug\net9.0\System.Composition.Convention.dll
@@ -150,6 +153,3 @@ C:\savorly\Savorly.API\obj\Debug\net9.0\refint\Savorly.API.dll
 C:\savorly\Savorly.API\obj\Debug\net9.0\Savorly.API.pdb
 C:\savorly\Savorly.API\obj\Debug\net9.0\Savorly.API.genruntimeconfig.cache
 C:\savorly\Savorly.API\obj\Debug\net9.0\ref\Savorly.API.dll
-C:\savorly\Savorly.API\bin\Debug\net9.0\Swashbuckle.AspNetCore.Swagger.dll
-C:\savorly\Savorly.API\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
-C:\savorly\Savorly.API\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerUI.dll

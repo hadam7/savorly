@@ -1,4 +1,5 @@
 import { Route, Routes, useLocation } from 'react-router-dom';
+import { fetchRecipes } from './api';
 import { Plus, ArrowRight, Timer, BookOpen, Search, Filter, SortAsc, SortDesc, X, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useMemo } from 'react';
@@ -36,20 +37,33 @@ function Home() {
   ];
 
   useEffect(() => {
-    if (user) {
-      const savedRecipes = localStorage.getItem(`savorly_user_recipes_${user.userName}`);
-      if (savedRecipes) {
-        try {
-          const userRecipes = JSON.parse(savedRecipes);
-          setAllRecipes([...userRecipes, ...sampleRecipes]);
-        } catch (e) {
-          console.error('Failed to parse user recipes', e);
-        }
+    const loadRecipes = async () => {
+      try {
+        const backendRecipes = await fetchRecipes();
+
+        const mappedRecipes = backendRecipes.map(r => ({
+          ...r,
+          instructions: [],
+          servings: 4,
+          isVegan: false,
+          allergens: [],
+          ingredients: [],
+          createdAt: new Date().toISOString(),
+          category: r.categories,
+          author: 'Savorly Chef',
+          likes: r.likes,
+          prepTime: r.prepTimeMinutes || 0
+        }));
+
+        setAllRecipes([...mappedRecipes, ...sampleRecipes] as any);
+      } catch (e) {
+        console.error('Failed to load recipes', e);
+        setAllRecipes(sampleRecipes);
       }
-    } else {
-      setAllRecipes(sampleRecipes);
-    }
-  }, [user]);
+    };
+
+    loadRecipes();
+  }, []);
 
   const filteredRecipes = useMemo(() => {
     let result = [...allRecipes];

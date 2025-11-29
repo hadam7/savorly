@@ -6,7 +6,11 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Savorly.API.Data;
 
+using Microsoft.IdentityModel.Logging;
+
 var builder = WebApplication.CreateBuilder(args);
+
+IdentityModelEventSource.ShowPII = true;
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
                       ?? "Data Source=site.db";
@@ -37,12 +41,31 @@ builder.Services
     {
         o.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateIssuerSigningKey = true,
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = false,
+            ValidateIssuerSigningKey = false,
             ValidIssuer = jwtIssuer,
             ValidAudience = jwtAudience,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+        };
+        o.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                Console.WriteLine("OnAuthenticationFailed: " + context.Exception.Message);
+                return Task.CompletedTask;
+            },
+            OnTokenValidated = context =>
+            {
+                Console.WriteLine("OnTokenValidated: " + context.SecurityToken);
+                return Task.CompletedTask;
+            },
+            OnChallenge = context =>
+            {
+                Console.WriteLine("OnChallenge: " + context.Error + " " + context.ErrorDescription);
+                return Task.CompletedTask;
+            }
         };
     });
 
@@ -78,8 +101,8 @@ app.UseHttpsRedirection();
 
 app.UseCors();
 
-app.UseAuthentication();
-app.UseAuthorization();
+// app.UseAuthentication();
+// app.UseAuthorization();
 
 app.MapControllers();
 

@@ -3,29 +3,49 @@ import { useState, useEffect } from 'react';
 import { sampleRecipes } from '../data/sampleRecipes';
 import { ArrowLeft, Clock, Users, Heart, Check, Trash2, Edit } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { fetchRecipeById, deleteRecipe } from '../api';
 
 export default function RecipeDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-
-  // Find recipe in sampleRecipes or localStorage
-  let recipe: any = sampleRecipes.find((r) => r.id === id);
-
-  if (!recipe && user) {
-    const savedRecipes = localStorage.getItem(`savorly_user_recipes_${user.userName}`);
-    if (savedRecipes) {
-      try {
-        const userRecipes = JSON.parse(savedRecipes);
-        recipe = userRecipes.find((r: any) => r.id === id);
-      } catch (e) {
-        console.error('Failed to parse user recipes', e);
-      }
-    }
-  }
+  const [recipe, setRecipe] = useState<any>(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    const loadRecipe = async () => {
+      if (!id) return;
+
+      try {
+        const backendRecipe = await fetchRecipeById(parseInt(id));
+
+        const mappedRecipe = {
+          ...backendRecipe,
+          instructions: backendRecipe.instructions || [],
+          allergens: backendRecipe.allergens || [],
+          ingredients: backendRecipe.ingredients || [],
+          category: [],
+          author: backendRecipe.authorName || 'Unknown',
+          likes: 0,
+          prepTime: backendRecipe.prepTimeMinutes || 0
+        };
+
+        setRecipe(mappedRecipe);
+      } catch (error) {
+        console.error('Failed to load recipe', error);
+        const sample = sampleRecipes.find(r => r.id === parseInt(id));
+        if (sample) {
+          setRecipe(sample);
+        } else {
+          navigate('/');
+        }
+      }
+    };
+
+    loadRecipe();
+  }, [id, navigate]);
 
   // Load favorites
   useEffect(() => {
@@ -67,14 +87,17 @@ export default function RecipeDetail() {
     setIsFavorite(!isFavorite);
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (window.confirm('Biztosan törölni szeretnéd ezt a receptet?')) {
-      const savedRecipes = localStorage.getItem(`savorly_user_recipes_${user?.userName}`);
-      if (savedRecipes) {
-        const userRecipes = JSON.parse(savedRecipes);
-        const updatedRecipes = userRecipes.filter((r: any) => r.id !== id);
-        localStorage.setItem(`savorly_user_recipes_${user?.userName}`, JSON.stringify(updatedRecipes));
-        navigate('/');
+      try {
+        const token = localStorage.getItem('savorly_token');
+        if (token && id) {
+          await deleteRecipe(token, parseInt(id));
+          navigate('/');
+        }
+      } catch (e) {
+        console.error('Failed to delete recipe', e);
+        alert('Hiba történt a törlés során.');
       }
     }
   };
@@ -114,10 +137,7 @@ export default function RecipeDetail() {
   if (!recipe) {
     return (
       <div className="mx-auto max-w-4xl px-4 py-10 pt-32">
-        <p className="text-slate-600">A recept nem található.</p>
-        <Link to="/" className="inline-flex items-center gap-2 mt-4 text-[#BD95A4] hover:text-[#755463]">
-          <ArrowLeft size={16} /> Vissza a főoldalra
-        </Link>
+        <p className="text-slate-600">Betöltés...</p>
       </div>
     );
   }
