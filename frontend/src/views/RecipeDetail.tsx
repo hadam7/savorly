@@ -111,7 +111,7 @@ export default function RecipeDetail() {
   }
 
   return (
-    <section className="min-h-screen pb-20 pt-28">
+    <section className="min-h-screen pb-20">
       {/* Hero Image */}
       <div className="relative h-[40vh] w-full overflow-hidden md:h-[50vh]">
         <div className="absolute inset-0 bg-slate-900/20" />

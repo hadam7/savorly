@@ -19,30 +19,58 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-    const [user, setUser] = useState<User | null>(null);
-    const [authenticated, setAuthenticated] = useState(false);
+    const [user, setUser] = useState<User | null>(() => {
+        try {
+            const savedUser = localStorage.getItem('savorly_user');
+            return savedUser ? JSON.parse(savedUser) : null;
+        } catch {
+            return null;
+        }
+    });
+    const [authenticated, setAuthenticated] = useState(() => {
+        return !!localStorage.getItem('savorly_token');
+    });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const token = localStorage.getItem('savorly_token');
+        const savedUser = localStorage.getItem('savorly_user');
+
         if (!token) {
             setLoading(false);
             setAuthenticated(false);
             return;
         }
 
+        if (savedUser) {
+            try {
+                setUser(JSON.parse(savedUser));
+                setAuthenticated(true);
+            } catch (e) {
+                console.error('Failed to parse saved user', e);
+            }
+        }
+
         (async () => {
             try {
                 const data = await fetchMe(token);
-                setUser({
+                const userData = {
                     userName: data.userName ?? data.UserName ?? '',
                     email: data.email ?? data.Email,
                     role: data.role ?? data.Role ?? 'User',
-                });
+                };
+                setUser(userData);
+                localStorage.setItem('savorly_user', JSON.stringify(userData));
                 setAuthenticated(true);
-            } catch {
-                setAuthenticated(false);
-                localStorage.removeItem('savorly_token');
+            } catch (e) {
+                console.error('Auth check failed', e);
+                // If we have a saved user, keep them logged in even if backend fails
+                // This ensures persistence works even if the backend is stateless or restarts
+                if (!savedUser) {
+                    setAuthenticated(false);
+                    localStorage.removeItem('savorly_token');
+                    localStorage.removeItem('savorly_user');
+                }
             } finally {
                 setLoading(false);
             }
@@ -50,11 +78,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const handleAuthSuccess = (resp: any) => {
-        localStorage.setItem('savorly_token', resp.token || resp.Token);
-        setUser({
+        const userData = {
             userName: resp.userName || resp.UserName,
             role: resp.role || resp.Role || 'User'
-        });
+        };
+
+        localStorage.setItem('savorly_token', resp.token || resp.Token);
+        localStorage.setItem('savorly_user', JSON.stringify(userData));
+
+        setUser(userData);
         setAuthenticated(true);
     };
 
@@ -70,6 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const logout = () => {
         localStorage.removeItem('savorly_token');
+        localStorage.removeItem('savorly_user');
         setUser(null);
         setAuthenticated(false);
     };
