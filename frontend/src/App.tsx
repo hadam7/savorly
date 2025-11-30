@@ -50,7 +50,7 @@ function Home() {
           instructions: [],
           servings: r.servings || 4,
           isVegan: r.isVegan,
-          allergens: [],
+          allergens: r.allergens || [],
           ingredients: [],
           createdAt: new Date().toISOString(),
           category: r.categories,

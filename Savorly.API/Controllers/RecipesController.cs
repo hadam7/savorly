@@ -41,7 +41,10 @@ public class RecipesController : ControllerBase
             AuthorName = r.User?.UserName,
             Categories = r.RecipeCategories.Select(rc => rc.Category.Name).ToList(),
             Likes = r.Likes,
-            IsVegan = r.IsVegan
+            IsVegan = r.IsVegan,
+            Allergens = !string.IsNullOrEmpty(r.Allergens)
+                ? JsonSerializer.Deserialize<List<string>>(r.Allergens) ?? new List<string>()
+                : new List<string>()
         });
 
         return Ok(result);

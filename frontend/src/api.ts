@@ -82,6 +82,7 @@ export interface RecipeListItem {
   likes: number;
   servings?: number;
   isVegan?: boolean;
+  allergens?: string[];
 }
 
 export type RecipeListItemDto = RecipeListItem;

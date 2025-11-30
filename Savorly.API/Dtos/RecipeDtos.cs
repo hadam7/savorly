@@ -14,6 +14,7 @@ public class RecipeListItemDto
     public List<string> Categories { get; set; } = new();
     public int Likes { get; set; } // Placeholder for now
     public bool IsVegan { get; set; }
+    public List<string> Allergens { get; set; } = new();
 }
 
 public class RecipeDetailDto

@@ -108,7 +108,7 @@ public static class DbInitializer
                     UserId = user.Id,
                     Likes = 85,
                     Difficulty = "Könnyű",
-                    RecipeCategories = GetCats(new[] { "Könnyű", "Vegetáriánus" })
+                    RecipeCategories = GetCats(new[] { "Könnyű", "Vegetáriánus", "Olasz" })
                 });
 
                 recipes.Add(new Recipe
@@ -159,7 +159,7 @@ public static class DbInitializer
                     UserId = user.Id,
                     Likes = 95,
                     Difficulty = "Közepes",
-                    RecipeCategories = GetCats(new[] { "Vegetáriánus", "Tészta" })
+                    RecipeCategories = GetCats(new[] { "Vegetáriánus", "Tészta", "Olasz" })
                 });
 
                 recipes.Add(new Recipe
@@ -210,7 +210,7 @@ public static class DbInitializer
                     UserId = user.Id,
                     Likes = 78,
                     Difficulty = "Könnyű",
-                    RecipeCategories = GetCats(new[] { "Vegán", "Könnyű" })
+                    RecipeCategories = GetCats(new[] { "Vegetáriánus", "Könnyű" })
                 });
 
                 recipes.Add(new Recipe
@@ -244,7 +244,7 @@ public static class DbInitializer
                     UserId = user.Id,
                     Likes = 92,
                     Difficulty = "Könnyű",
-                    RecipeCategories = GetCats(new[] { "Könnyű", "Vegán" })
+                    RecipeCategories = GetCats(new[] { "Könnyű", "Vegetáriánus" })
                 });
 
                 recipes.Add(new Recipe
@@ -261,7 +261,7 @@ public static class DbInitializer
                     UserId = user.Id,
                     Likes = 105,
                     Difficulty = "Könnyű",
-                    RecipeCategories = GetCats(new[] { "Előétel", "Vegán" })
+                    RecipeCategories = GetCats(new[] { "Előétel", "Vegetáriánus", "Olasz" })
                 });
 
                 recipes.Add(new Recipe
@@ -278,7 +278,7 @@ public static class DbInitializer
                     UserId = user.Id,
                     Likes = 156,
                     Difficulty = "Közepes",
-                    RecipeCategories = GetCats(new[] { "Tészta" })
+                    RecipeCategories = GetCats(new[] { "Tészta", "Olasz" })
                 });
 
                 context.Recipes.AddRange(recipes);
