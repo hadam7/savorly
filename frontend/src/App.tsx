@@ -117,7 +117,7 @@ function Home() {
     <>
       <Hero />
 
-      <section className="mx-auto max-w-6xl px-4 py-12">
+      <section id="recipes" className="mx-auto max-w-6xl px-4 py-12">
         <div className="mb-12 space-y-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
@@ -301,50 +301,7 @@ function Home() {
   );
 }
 
-function Recipes() {
-  return (
-    <section className="mx-auto max-w-6xl px-4 py-24 min-h-screen">
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-12">
-        <div>
-          <h1 className="text-4xl font-bold text-slate-900 mb-2">Receptjeid</h1>
-          <p className="text-slate-500">Kezeld és rendszerezd saját receptgyűjteményedet.</p>
-        </div>
-        <button className="inline-flex items-center gap-2 px-6 py-3 bg-[#BD95A4] text-white rounded-full font-semibold shadow-lg shadow-[#BD95A4]/30 hover:bg-[#A1836C] hover:-translate-y-0.5 transition-all duration-300">
-          <Plus size={18} />
-          Új recept
-        </button>
-      </div>
 
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-        {['Tészta', 'Levesek', 'Desszertek'].map((cat, idx) => (
-          <motion.article
-            key={cat}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.1 }}
-            className="group p-6 bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/40 transition-all duration-300 cursor-pointer"
-          >
-            <div className="flex justify-between items-start mb-4">
-              <div className="p-3 rounded-2xl bg-slate-50 text-[#BD95A4] group-hover:bg-[#BD95A4] group-hover:text-white transition-colors duration-300">
-                <BookOpen size={24} />
-              </div>
-              <span className="px-3 py-1 rounded-full bg-slate-100 text-xs font-semibold text-slate-600">
-                3 recept
-              </span>
-            </div>
-            <h3 className="text-xl font-bold text-slate-900 mb-2">{cat}</h3>
-            <p className="text-sm text-slate-500 mb-6">
-              Válogatott receptek a {cat.toLowerCase()} kategóriában.
-            </p>
-            <div className="flex items-center text-sm font-semibold text-[#BD95A4] group-hover:translate-x-1 transition-transform duration-300">
-              Megnyitás <ArrowRight size={16} className="ml-1" />
-            </div>
-          </motion.article>
-        ))}
-      </div>
-    </section>
-  );
-}
 
 function Categories() {
   return (
@@ -392,7 +349,6 @@ function AppShell() {
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<Home />} />
           <Route path="/recipe/:id" element={<RecipeDetail />} />
-          <Route path="/recipes" element={<Recipes />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

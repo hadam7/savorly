@@ -62,8 +62,14 @@ export default function Navbar() {
 
         {/* Navigation Links */}
         <div className="flex items-center gap-2">
-          <NavLink to="/" icon={<Home size={18} />} label="Főoldal" active={isActive('/')} />
-          <NavLink to="/recipes" icon={<BookOpen size={18} />} label="Receptek" active={isActive('/recipes')} />
+          <NavLink to="/" icon={<Home size={18} />} label="Főoldal" active={isActive('/') && location.hash !== '#browse'} />
+          <NavLink
+            to="/"
+            icon={<BookOpen size={18} />}
+            label="Receptek"
+            active={isActive('/')}
+            onClick={() => document.getElementById('recipes')?.scrollIntoView({ behavior: 'smooth' })}
+          />
           {authenticated && (
             <NavLink to="/create-recipe" icon={<PlusCircle size={18} />} label="Új recept" active={isActive('/create-recipe')} />
           )}
@@ -116,10 +122,11 @@ export default function Navbar() {
   );
 }
 
-function NavLink({ to, icon, label, active }: { to: string; icon: React.ReactNode; label: string; active: boolean }) {
+function NavLink({ to, icon, label, active, onClick }: { to: string; icon: React.ReactNode; label: string; active: boolean; onClick?: () => void }) {
   return (
     <Link
       to={to}
+      onClick={onClick}
       className={`
         relative flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-300
         ${active

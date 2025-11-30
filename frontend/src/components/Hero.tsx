@@ -61,19 +61,16 @@ export default function Hero() {
                     transition={{ duration: 0.8, delay: 0.6 }}
                     className="flex flex-col sm:flex-row items-center justify-center gap-4"
                 >
-                    <Link
-                        to="/recipes"
+                    <button
+                        onClick={() => {
+                            document.getElementById('recipes')?.scrollIntoView({ behavior: 'smooth' });
+                        }}
                         className="group relative px-8 py-4 bg-slate-900 text-white rounded-full font-semibold overflow-hidden shadow-xl shadow-slate-900/20 hover:shadow-2xl hover:shadow-slate-900/30 transition-all duration-300 hover:-translate-y-1"
                     >
                         <span className="relative z-10 flex items-center gap-2">
                             Böngészés <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
                         </span>
                         <div className="absolute inset-0 bg-gradient-to-r from-slate-800 to-slate-900 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    </Link>
-
-                    <button className="group px-8 py-4 bg-white text-slate-900 rounded-full font-semibold border border-slate-200 shadow-lg shadow-slate-200/50 hover:shadow-xl hover:border-slate-300 transition-all duration-300 hover:-translate-y-1 flex items-center gap-2">
-                        <PlayCircle size={18} className="text-[#BD95A4] group-hover:scale-110 transition-transform duration-300" />
-                        Hogyan működik?
                     </button>
                 </motion.div>
             </div>
