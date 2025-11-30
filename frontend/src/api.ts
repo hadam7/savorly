@@ -67,6 +67,7 @@ export interface Recipe {
   authorName?: string;
   createdAt: string;
   categoryIds: number[];
+  likes: number;
 }
 
 export interface RecipeListItem {
@@ -243,4 +244,28 @@ export async function updateCategory(token: string, id: number, name: string): P
     body: JSON.stringify({ name })
   });
   if (!res.ok) throw new Error('Failed to update category');
+}
+
+export async function likeRecipe(token: string, id: number): Promise<{ likes: number }> {
+  const cleanToken = token.replace(/"/g, '').trim();
+  const res = await fetch(`${API_BASE_URL}/recipes/${id}/like`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${cleanToken}`
+    }
+  });
+  if (!res.ok) throw new Error('Failed to like recipe');
+  return res.json();
+}
+
+export async function unlikeRecipe(token: string, id: number): Promise<{ likes: number }> {
+  const cleanToken = token.replace(/"/g, '').trim();
+  const res = await fetch(`${API_BASE_URL}/recipes/${id}/unlike`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${cleanToken}`
+    }
+  });
+  if (!res.ok) throw new Error('Failed to unlike recipe');
+  return res.json();
 }

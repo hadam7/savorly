@@ -33,5 +33,34 @@ public static class DbInitializer
         }
 
         context.SaveChanges();
+
+        // Users
+        if (!context.Users.Any())
+        {
+            var hasher = new Microsoft.AspNetCore.Identity.PasswordHasher<User>();
+
+            var admin = new User
+            {
+                UserName = "admin",
+                Email = "admin@savorly.com",
+                Role = "Admin",
+                CreatedAt = DateTime.UtcNow,
+                IsActive = true
+            };
+            admin.PasswordHash = hasher.HashPassword(admin, "admin123");
+
+            var user = new User
+            {
+                UserName = "user",
+                Email = "user@savorly.com",
+                Role = "User",
+                CreatedAt = DateTime.UtcNow,
+                IsActive = true
+            };
+            user.PasswordHash = hasher.HashPassword(user, "user123");
+
+            context.Users.AddRange(admin, user);
+            context.SaveChanges();
+        }
     }
 }

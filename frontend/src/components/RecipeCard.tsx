@@ -12,9 +12,10 @@ interface RecipeCardProps {
 }
 
 export default function RecipeCard({ recipe, index = 0 }: RecipeCardProps) {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const navigate = useNavigate();
   const [isFavorite, setIsFavorite] = useState(false);
+  const [likesCount, setLikesCount] = useState(recipe.likes || 0);
 
   useEffect(() => {
     if (user) {
@@ -22,7 +23,8 @@ export default function RecipeCard({ recipe, index = 0 }: RecipeCardProps) {
       if (savedFavorites) {
         try {
           const favorites = JSON.parse(savedFavorites);
-          setIsFavorite(favorites.includes(recipe.id));
+          // Ensure we compare strings
+          setIsFavorite(favorites.includes(String(recipe.id)));
         } catch (e) {
           console.error('Failed to parse favorites', e);
         }
@@ -32,28 +34,57 @@ export default function RecipeCard({ recipe, index = 0 }: RecipeCardProps) {
     }
   }, [user, recipe.id]);
 
-  const handleToggleFavorite = (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent navigation to recipe detail
+  useEffect(() => {
+    setLikesCount(recipe.likes || 0);
+  }, [recipe.likes]);
+
+  const handleToggleFavorite = async (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
 
-    if (!user) {
+    if (!user || !token) {
       navigate('/login');
       return;
     }
 
-    const savedFavorites = localStorage.getItem(`savorly_favorites_${user.userName}`);
-    let favorites: string[] = savedFavorites ? JSON.parse(savedFavorites) : [];
+    try {
+      const api = await import('../api');
+      let newLikes = likesCount;
+      const recipeId = parseInt(String(recipe.id)); // Ensure number for API
 
-    if (isFavorite) {
-      favorites = favorites.filter((favId) => favId !== recipe.id);
-    } else {
-      if (!favorites.includes(recipe.id)) {
-        favorites.push(recipe.id);
+      if (isFavorite) {
+        const res = await api.unlikeRecipe(token, recipeId);
+        newLikes = res.likes;
+      } else {
+        const res = await api.likeRecipe(token, recipeId);
+        newLikes = res.likes;
       }
-    }
 
-    localStorage.setItem(`savorly_favorites_${user.userName}`, JSON.stringify(favorites));
-    setIsFavorite(!isFavorite);
+      setLikesCount(newLikes);
+
+      // Update local storage for "favorite" status (UI toggle)
+      const savedFavorites = localStorage.getItem(`savorly_favorites_${user.userName}`);
+      let favorites: string[] = savedFavorites ? JSON.parse(savedFavorites) : [];
+      const strId = String(recipe.id);
+
+      if (isFavorite) {
+        favorites = favorites.filter((favId) => favId !== strId);
+      } else {
+        if (!favorites.includes(strId)) {
+          favorites.push(strId);
+        }
+      }
+
+      localStorage.setItem(`savorly_favorites_${user.userName}`, JSON.stringify(favorites));
+      setIsFavorite(!isFavorite);
+
+    } catch (err) {
+      console.error('Failed to toggle like', err);
+    }
+  };
+
+  const handleCardClick = () => {
+    navigate(`/recipe/${recipe.id}`);
   };
 
   return (
@@ -62,11 +93,12 @@ export default function RecipeCard({ recipe, index = 0 }: RecipeCardProps) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="group relative h-full"
+      className="group relative h-full cursor-pointer"
+      onClick={handleCardClick}
     >
-      <div className="relative h-full overflow-hidden rounded-3xl bg-white border border-white/60 shadow-lg shadow-slate-200/40 transition-all duration-500 hover:shadow-xl hover:shadow-slate-200/60 hover:-translate-y-2">
+      <div className="relative h-full flex flex-col overflow-hidden rounded-3xl bg-white border border-white/60 shadow-lg shadow-slate-200/40 transition-all duration-500 hover:shadow-xl hover:shadow-slate-200/60 hover:-translate-y-2">
         {/* Image Container */}
-        <div className="relative h-64 overflow-hidden">
+        <div className="relative h-64 shrink-0 overflow-hidden">
           <div className="absolute inset-0 bg-slate-900/10 group-hover:bg-slate-900/0 transition-colors duration-500 z-10" />
           <img
             src={recipe.imageUrl}
@@ -94,24 +126,21 @@ export default function RecipeCard({ recipe, index = 0 }: RecipeCardProps) {
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="p-6 flex-1 flex flex-col">
           <div className="flex items-start justify-between gap-4 mb-3">
             <h3 className="text-xl font-bold text-slate-900 line-clamp-1 group-hover:text-[#755463] transition-colors duration-300">
               {recipe.title}
             </h3>
-            <Link
-              to={`/recipe/${recipe.id}`}
-              className="p-2 -mr-2 -mt-2 text-slate-300 hover:text-[#BD95A4] transition-colors duration-300"
-            >
+            <div className="p-2 -mr-2 -mt-2 text-slate-300 group-hover:text-[#BD95A4] transition-colors duration-300">
               <ArrowUpRight size={20} />
-            </Link>
+            </div>
           </div>
 
           <p className="text-sm text-slate-500 line-clamp-2 mb-6 leading-relaxed">
             {recipe.description}
           </p>
 
-          <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+          <div className="mt-auto flex items-center justify-between pt-4 border-t border-slate-100">
             <div className="flex items-center gap-4 text-xs font-medium text-slate-500">
               <div className="flex items-center gap-1.5">
                 <Clock size={14} className="text-[#BD95A4]" />
@@ -120,6 +149,10 @@ export default function RecipeCard({ recipe, index = 0 }: RecipeCardProps) {
               <div className="flex items-center gap-1.5">
                 <Users size={14} className="text-[#A1836C]" />
                 <span>{recipe.servings} adag</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Heart size={14} className="text-red-400" />
+                <span>{likesCount}</span>
               </div>
             </div>
           </div>

@@ -40,7 +40,7 @@ public class RecipesController : ControllerBase
             Difficulty = r.Difficulty,
             AuthorName = r.User?.UserName,
             Categories = r.RecipeCategories.Select(rc => rc.Category.Name).ToList(),
-            Likes = 0 // Placeholder
+            Likes = r.Likes
         });
 
         return Ok(result);
@@ -78,7 +78,8 @@ public class RecipesController : ControllerBase
                 : new List<string>(),
             AuthorName = recipe.User?.UserName,
             CreatedAt = recipe.CreatedAt,
-            CategoryIds = recipe.RecipeCategories.Select(rc => rc.CategoryId).ToList()
+            CategoryIds = recipe.RecipeCategories.Select(rc => rc.CategoryId).ToList(),
+            Likes = recipe.Likes
         };
 
         return Ok(dto);
@@ -111,7 +112,8 @@ public class RecipesController : ControllerBase
             IsVegan = dto.IsVegan,
             Allergens = JsonSerializer.Serialize(dto.Allergens),
             Ingredients = JsonSerializer.Serialize(dto.Ingredients),
-            UserId = user.Id
+            UserId = user.Id,
+            Likes = 0
         };
 
         _db.Recipes.Add(recipe);
@@ -192,6 +194,33 @@ public class RecipesController : ControllerBase
         _db.Recipes.Remove(recipe);
         await _db.SaveChangesAsync();
         return NoContent();
+    }
+
+    [HttpPost("{id:int}/like")]
+    public async Task<IActionResult> Like(int id)
+    {
+        var recipe = await _db.Recipes.FindAsync(id);
+        if (recipe == null) return NotFound();
+
+        recipe.Likes++;
+        await _db.SaveChangesAsync();
+
+        return Ok(new { likes = recipe.Likes });
+    }
+
+    [HttpPost("{id:int}/unlike")]
+    public async Task<IActionResult> Unlike(int id)
+    {
+        var recipe = await _db.Recipes.FindAsync(id);
+        if (recipe == null) return NotFound();
+
+        if (recipe.Likes > 0)
+        {
+            recipe.Likes--;
+            await _db.SaveChangesAsync();
+        }
+
+        return Ok(new { likes = recipe.Likes });
     }
 
     private async Task UpdateRecipeCategories(Recipe recipe, List<int> categoryIds)

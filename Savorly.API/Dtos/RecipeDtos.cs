@@ -31,6 +31,7 @@ public class RecipeDetailDto
     public string? AuthorName { get; set; }
     public DateTime CreatedAt { get; set; }
     public List<int> CategoryIds { get; set; } = new();
+    public int Likes { get; set; }
 }
 
 public class RecipeCreateUpdateDto

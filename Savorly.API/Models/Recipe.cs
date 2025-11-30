@@ -12,6 +12,7 @@ public class Recipe
     public int? PrepTimeMinutes { get; set; }
     public string? Difficulty { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public int Likes { get; set; }
 
     // New Fields
     public string? ImageUrl { get; set; }

@@ -8,9 +8,10 @@ import { fetchRecipeById, deleteRecipe } from '../api';
 export default function RecipeDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [recipe, setRecipe] = useState<any>(null);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -28,14 +29,15 @@ export default function RecipeDetail() {
           ingredients: backendRecipe.ingredients || [],
           category: [],
           author: backendRecipe.authorName || 'Unknown',
-          likes: 0,
+          likes: backendRecipe.likes || 0,
           prepTime: backendRecipe.prepTimeMinutes || 0
         };
 
         setRecipe(mappedRecipe);
+        setLikesCount(mappedRecipe.likes);
       } catch (error) {
         console.error('Failed to load recipe', error);
-        const sample = sampleRecipes.find(r => r.id === parseInt(id));
+        const sample = sampleRecipes.find(r => r.id === id);
         if (sample) {
           setRecipe(sample);
         } else {
@@ -64,27 +66,44 @@ export default function RecipeDetail() {
     }
   }, [user, id]);
 
-  const handleToggleFavorite = () => {
-    if (!user) {
+  const handleToggleFavorite = async () => {
+    if (!user || !token) {
       navigate('/login');
       return;
     }
 
     if (!id) return;
 
-    const savedFavorites = localStorage.getItem(`savorly_favorites_${user.userName}`);
-    let favorites: string[] = savedFavorites ? JSON.parse(savedFavorites) : [];
+    try {
+      const api = await import('../api');
+      let newLikes = likesCount;
 
-    if (isFavorite) {
-      favorites = favorites.filter((favId) => favId !== id);
-    } else {
-      if (!favorites.includes(id)) {
-        favorites.push(id);
+      if (isFavorite) {
+        const res = await api.unlikeRecipe(token, parseInt(id));
+        newLikes = res.likes;
+      } else {
+        const res = await api.likeRecipe(token, parseInt(id));
+        newLikes = res.likes;
       }
-    }
 
-    localStorage.setItem(`savorly_favorites_${user.userName}`, JSON.stringify(favorites));
-    setIsFavorite(!isFavorite);
+      setLikesCount(newLikes);
+
+      const savedFavorites = localStorage.getItem(`savorly_favorites_${user.userName}`);
+      let favorites: string[] = savedFavorites ? JSON.parse(savedFavorites) : [];
+
+      if (isFavorite) {
+        favorites = favorites.filter((favId) => favId !== id);
+      } else {
+        if (!favorites.includes(id)) {
+          favorites.push(id);
+        }
+      }
+
+      localStorage.setItem(`savorly_favorites_${user.userName}`, JSON.stringify(favorites));
+      setIsFavorite(!isFavorite);
+    } catch (err) {
+      console.error('Failed to toggle like', err);
+    }
   };
 
   const handleDelete = async () => {
@@ -185,6 +204,15 @@ export default function RecipeDetail() {
                 <div>
                   <p className="text-xs font-medium text-slate-500">Adagok</p>
                   <p className="font-semibold text-slate-900">{recipe.servings} fő</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-50 text-red-400">
+                  <Heart size={20} />
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-slate-500">Kedvelések</p>
+                  <p className="font-semibold text-slate-900">{likesCount}</p>
                 </div>
               </div>
             </div>
