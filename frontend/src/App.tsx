@@ -314,110 +314,36 @@ function Home() {
             </div>
           )}
         </div>
-      </section >
-
-      <section className="bg-white py-20 border-y border-slate-100">
-        <div className="mx-auto max-w-6xl px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">Kategóriák felfedezése</h2>
-            <p className="text-slate-500 max-w-2xl mx-auto">
-              Találd meg a tökéletes receptet bármilyen alkalomra. Legyen szó gyors vacsoráról vagy ünnepi lakomáról.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            {[
-              { name: 'Gyors', icon: '⚡', color: 'from-orange-400 to-orange-600' },
-              { name: 'Egészséges', icon: '🥗', color: 'from-green-400 to-green-600' },
-              { name: 'Desszert', icon: '🍰', color: 'from-pink-400 to-pink-600' },
-              { name: 'Vegán', icon: '🌱', color: 'from-lime-400 to-lime-600' },
-              { name: 'Főételek', icon: '🍖', color: 'from-red-400 to-red-600' },
-              { name: 'Levesek', icon: '🍲', color: 'from-amber-400 to-amber-600' },
-            ].map((cat, idx) => (
-              <motion.button
-                key={cat.name}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.05 }}
-                className="group relative p-6 bg-slate-50 rounded-3xl border border-slate-100 transition-all duration-300 hover:bg-white hover:shadow-xl hover:shadow-slate-200/50 hover:-translate-y-1"
-              >
-                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${cat.color} flex items-center justify-center text-2xl mb-4 shadow-sm group-hover:scale-110 transition-transform duration-300`}>
-                  {cat.icon}
-                </div>
-                <h3 className="font-semibold text-slate-900 mb-1">{cat.name}</h3>
-                <p className="text-xs text-slate-500">120+ recept</p>
-              </motion.button>
-            ))}
-          </div>
-        </div>
       </section>
     </>
   );
 }
 
-
-
-function Categories() {
-  return (
-    <section className="mx-auto max-w-6xl px-4 py-24 min-h-screen">
-      <div className="text-center mb-16">
-        <h1 className="text-4xl font-bold text-slate-900 mb-4">Kategóriák</h1>
-        <p className="text-slate-500 max-w-2xl mx-auto">
-          Böngéssz a különböző kategóriák között és találd meg a kedvencedet.
-        </p>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-3">
-        {["Gyors", "Egészséges", "Vendégváró", "Comfort food", "Desszert", "Meal prep"].map((item, idx) => (
-          <motion.div
-            key={item}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: idx * 0.05 }}
-            className="flex items-center justify-between p-6 bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg hover:border-[#BD95A4]/30 transition-all duration-300 cursor-pointer group"
-          >
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-[#BD95A4] group-hover:text-white transition-colors duration-300">
-                <BookOpen size={18} />
-              </div>
-              <span className="font-semibold text-slate-700 group-hover:text-slate-900">{item}</span>
-            </div>
-            <span className="flex items-center gap-1 text-xs font-medium text-slate-400">
-              <Timer size={14} /> {3 + idx} recept
-            </span>
-          </motion.div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function AppShell() {
+              function AppShell() {
   const location = useLocation();
 
-  return (
-    <div className="relative flex min-h-screen flex-col overflow-hidden bg-slate-50 selection:bg-[#BD95A4]/20 selection:text-[#755463]">
-      <Navbar />
+              return (
+              <div className="relative flex min-h-screen flex-col overflow-hidden bg-slate-50 selection:bg-[#BD95A4]/20 selection:text-[#755463]">
+                <Navbar />
 
-      <main className="flex-1">
-        <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<Home />} />
-          <Route path="/recipe/:id" element={<RecipeDetail />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/create-recipe" element={<CreateRecipe />} />
-          <Route path="/edit-recipe/:id" element={<CreateRecipe />} />
-        </Routes>
-      </main>
+                <main className="flex-1">
+                  <Routes location={location} key={location.pathname}>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/recipe/:id" element={<RecipeDetail />} />
+                    <Route path="/admin" element={<AdminDashboard />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/create-recipe" element={<CreateRecipe />} />
+                    <Route path="/edit-recipe/:id" element={<CreateRecipe />} />
+                  </Routes>
+                </main>
 
-      <Footer />
-    </div>
-  );
+                <Footer />
+              </div>
+              );
 }
 
-export default function App() {
+              export default function App() {
   return <AppShell />;
 }

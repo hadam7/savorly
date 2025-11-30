@@ -80,6 +80,8 @@ export interface RecipeListItem {
   authorName?: string;
   categories: string[];
   likes: number;
+  servings?: number;
+  isVegan?: boolean;
 }
 
 export type RecipeListItemDto = RecipeListItem;

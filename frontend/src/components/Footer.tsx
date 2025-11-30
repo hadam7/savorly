@@ -1,63 +1,45 @@
-import { ChefHat, Github, Twitter, Instagram } from 'lucide-react';
+import { ChefHat, Github, Facebook, Instagram } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Footer() {
     return (
         <footer className="bg-white border-t border-slate-200/60 pt-16 pb-8">
             <div className="max-w-6xl mx-auto px-4">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-                    <div className="col-span-1 md:col-span-1">
-                        <Link to="/" className="flex items-center gap-2 mb-4">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#BD95A4] to-[#A1836C] text-white">
-                                <ChefHat size={16} />
+                <div className="flex flex-col md:flex-row justify-between items-center gap-8 mb-12">
+                    {/* Brand */}
+                    <div className="flex flex-col items-center md:items-start gap-4 max-w-sm text-center md:text-left">
+                        <Link to="/" className="flex items-center gap-2">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#BD95A4] to-[#A1836C] text-white shadow-md shadow-[#BD95A4]/20">
+                                <ChefHat size={20} strokeWidth={2.5} />
                             </div>
-                            <span className="font-bold text-slate-800 text-lg">Savorly</span>
+                            <span className="font-bold text-slate-800 text-xl tracking-tight">
+                                Savorly
+                            </span>
                         </Link>
-                        <p className="text-sm text-slate-500 leading-relaxed">
+                        <p className="text-slate-500 leading-relaxed">
                             A modern receptgyűjtő alkalmazás, ahol a főzés művészete találkozik a közösséggel.
                         </p>
                     </div>
 
-                    <div>
-                        <h4 className="font-semibold text-slate-900 mb-4">Felfedezés</h4>
-                        <ul className="space-y-2 text-sm text-slate-500">
-                            <li><Link to="/recipes" className="hover:text-[#BD95A4] transition-colors">Receptek</Link></li>
-                            <li><Link to="/categories" className="hover:text-[#BD95A4] transition-colors">Kategóriák</Link></li>
-                            <li><Link to="/popular" className="hover:text-[#BD95A4] transition-colors">Népszerű</Link></li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h4 className="font-semibold text-slate-900 mb-4">Közösség</h4>
-                        <ul className="space-y-2 text-sm text-slate-500">
-                            <li><Link to="/about" className="hover:text-[#BD95A4] transition-colors">Rólunk</Link></li>
-                            <li><Link to="/blog" className="hover:text-[#BD95A4] transition-colors">Blog</Link></li>
-                            <li><Link to="/contact" className="hover:text-[#BD95A4] transition-colors">Kapcsolat</Link></li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h4 className="font-semibold text-slate-900 mb-4">Kövess minket</h4>
-                        <div className="flex gap-4">
-                            <a href="#" className="p-2 rounded-full bg-slate-100 text-slate-600 hover:bg-[#BD95A4] hover:text-white transition-all duration-300">
-                                <Github size={18} />
+                    {/* Social Links */}
+                    <div className="flex flex-col items-center gap-4">
+                        <h3 className="font-semibold text-slate-900">Kövess minket</h3>
+                        <div className="flex gap-3">
+                            <a href="https://github.com/hadam7" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-slate-100 text-slate-600 hover:bg-[#BD95A4] hover:text-white transition-all duration-300">
+                                <Github size={20} />
                             </a>
-                            <a href="#" className="p-2 rounded-full bg-slate-100 text-slate-600 hover:bg-[#BD95A4] hover:text-white transition-all duration-300">
-                                <Twitter size={18} />
+                            <a href="https://www.facebook.com/adam.halasz.7528/" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-slate-100 text-slate-600 hover:bg-[#1877F2] hover:text-white transition-all duration-300">
+                                <Facebook size={20} />
                             </a>
-                            <a href="#" className="p-2 rounded-full bg-slate-100 text-slate-600 hover:bg-[#BD95A4] hover:text-white transition-all duration-300">
-                                <Instagram size={18} />
+                            <a href="https://www.instagram.com/halaszadam7/" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-slate-100 text-slate-600 hover:bg-[#E4405F] hover:text-white transition-all duration-300">
+                                <Instagram size={20} />
                             </a>
                         </div>
                     </div>
                 </div>
 
-                <div className="pt-8 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-                    <p>© 2024 Savorly. Minden jog fenntartva.</p>
-                    <div className="flex gap-6">
-                        <a href="#" className="hover:text-slate-600">Adatvédelem</a>
-                        <a href="#" className="hover:text-slate-600">Felhasználási feltételek</a>
-                    </div>
+                <div className="pt-8 border-t border-slate-100 text-center text-sm text-slate-400">
+                    &copy; {new Date().getFullYear()} Savorly.
                 </div>
             </div>
         </footer>
