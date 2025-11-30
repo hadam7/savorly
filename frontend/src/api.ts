@@ -67,6 +67,7 @@ export interface Recipe {
   authorName?: string;
   createdAt: string;
   categoryIds: number[];
+  categories?: string[];
   likes: number;
 }
 

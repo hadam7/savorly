@@ -28,7 +28,7 @@ export default function RecipeDetail() {
           instructions: backendRecipe.instructions || [],
           allergens: backendRecipe.allergens || [],
           ingredients: backendRecipe.ingredients || [],
-          category: [],
+          category: backendRecipe.categories || [],
           author: backendRecipe.authorName || 'Unknown',
           likes: backendRecipe.likes || 0,
           prepTime: backendRecipe.prepTimeMinutes || 0
@@ -183,9 +183,7 @@ export default function RecipeDetail() {
         )}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-slate-900/80 to-transparent p-8 md:p-12">
           <div className="mx-auto max-w-4xl">
-            <span className="mb-4 inline-block rounded-full bg-[#BD95A4] px-4 py-1.5 text-sm font-semibold text-white shadow-sm">
-              {recipe.category}
-            </span>
+
             <h1 className="text-3xl font-bold text-white md:text-5xl">{recipe.title}</h1>
           </div>
         </div>
@@ -283,11 +281,11 @@ export default function RecipeDetail() {
 
           <div className="mb-8 flex flex-wrap gap-2">
             {Array.isArray(recipe.category) ? recipe.category.map((cat: string) => (
-              <span key={cat} className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-600">
+              <span key={cat} className="inline-flex items-center rounded-full bg-[#A1836C]/90 backdrop-blur-sm px-4 py-1.5 text-sm font-semibold text-white shadow-sm border border-white/20">
                 {cat}
               </span>
             )) : (
-              <span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-600">
+              <span className="inline-flex items-center rounded-full bg-[#A1836C]/90 backdrop-blur-sm px-4 py-1.5 text-sm font-semibold text-white shadow-sm border border-white/20">
                 {recipe.category}
               </span>
             )}

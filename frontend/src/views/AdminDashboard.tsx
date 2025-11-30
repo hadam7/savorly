@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { fetchUsers, deleteUser, toggleUserStatus, fetchUserRecipes, deleteRecipe, RecipeListItemDto } from '../api';
-import { Trash2, Shield, ShieldOff, User as UserIcon, Search, AlertTriangle, BookOpen, X, Wrench } from 'lucide-react';
+import { Trash2, Shield, ShieldOff, User as UserIcon, Search, AlertTriangle, BookOpen, X, Wrench, ChefHat } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface UserData {
@@ -33,6 +33,7 @@ export default function AdminDashboard() {
     const [newCategoryName, setNewCategoryName] = useState('');
     const [loadingCategories, setLoadingCategories] = useState(false);
     const [editingCategory, setEditingCategory] = useState<{ id: number, name: string } | null>(null);
+    const [failedImages, setFailedImages] = useState<Set<number>>(new Set());
 
     useEffect(() => {
         loadUsers();
@@ -421,11 +422,16 @@ export default function AdminDashboard() {
                                                 className="flex items-center gap-4 p-4 rounded-xl border border-slate-100 hover:border-[#BD95A4]/30 hover:bg-[#BD95A4]/5 transition-colors cursor-pointer"
                                             >
                                                 <div className="h-16 w-16 rounded-lg bg-slate-100 overflow-hidden flex-shrink-0">
-                                                    {recipe.imageUrl ? (
-                                                        <img src={recipe.imageUrl} alt={recipe.title} className="h-full w-full object-cover" />
+                                                    {recipe.imageUrl && !failedImages.has(recipe.id) ? (
+                                                        <img
+                                                            src={recipe.imageUrl}
+                                                            alt={recipe.title}
+                                                            className="h-full w-full object-cover"
+                                                            onError={() => setFailedImages(prev => new Set(prev).add(recipe.id))}
+                                                        />
                                                     ) : (
-                                                        <div className="h-full w-full flex items-center justify-center text-slate-400">
-                                                            <BookOpen size={24} />
+                                                        <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-[#BD95A4] to-[#A1836C] text-white">
+                                                            <ChefHat size={24} strokeWidth={1.5} className="opacity-90" />
                                                         </div>
                                                     )}
                                                 </div>

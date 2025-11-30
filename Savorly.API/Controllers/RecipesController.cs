@@ -83,6 +83,7 @@ public class RecipesController : ControllerBase
             AuthorName = recipe.User?.UserName,
             CreatedAt = recipe.CreatedAt,
             CategoryIds = recipe.RecipeCategories.Select(rc => rc.CategoryId).ToList(),
+            Categories = recipe.RecipeCategories.Select(rc => rc.Category.Name).ToList(),
             Likes = recipe.Likes
         };
 

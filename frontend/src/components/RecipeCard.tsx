@@ -118,7 +118,10 @@ export default function RecipeCard({ recipe, index = 0 }: RecipeCardProps) {
           {/* Floating Category Badge */}
           <div className="absolute top-4 left-4 z-20 flex gap-2">
             <span className="px-3 py-1.5 text-xs font-bold tracking-wide text-white uppercase bg-white/20 backdrop-blur-md border border-white/30 rounded-full shadow-sm">
-              {Array.isArray(recipe.category) ? recipe.category[0] : recipe.category}
+              {(() => {
+                const cats = (recipe as any).categories || (recipe as any).category;
+                return Array.isArray(cats) ? cats[0] : cats;
+              })()}
             </span>
             {recipe.isVegan && (
               <span className="px-3 py-1.5 text-xs font-bold tracking-wide text-white uppercase bg-[#A1836C]/90 backdrop-blur-md border border-white/30 rounded-full shadow-sm">
@@ -142,7 +145,7 @@ export default function RecipeCard({ recipe, index = 0 }: RecipeCardProps) {
         {/* Content */}
         <div className="p-6 flex-1 flex flex-col">
           <div className="flex items-start justify-between gap-4 mb-3">
-            <h3 className="text-xl font-bold text-slate-900 line-clamp-1 group-hover:text-[#755463] transition-colors duration-300">
+            <h3 className="text-xl font-bold text-slate-900 line-clamp-2 group-hover:text-[#755463] transition-colors duration-300">
               {recipe.title}
             </h3>
             <div className="p-2 -mr-2 -mt-2 text-slate-300 group-hover:text-[#BD95A4] transition-colors duration-300">
