@@ -13,6 +13,7 @@ public class RecipeListItemDto
     public string? AuthorName { get; set; }
     public List<string> Categories { get; set; } = new();
     public int Likes { get; set; } // Placeholder for now
+    public bool IsVegan { get; set; }
 }
 
 public class RecipeDetailDto

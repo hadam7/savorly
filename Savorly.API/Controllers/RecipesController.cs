@@ -40,7 +40,8 @@ public class RecipesController : ControllerBase
             Difficulty = r.Difficulty,
             AuthorName = r.User?.UserName,
             Categories = r.RecipeCategories.Select(rc => rc.Category.Name).ToList(),
-            Likes = r.Likes
+            Likes = r.Likes,
+            IsVegan = r.IsVegan
         });
 
         return Ok(result);

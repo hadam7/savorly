@@ -13,6 +13,7 @@ import RecipeCard from './components/RecipeCard';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Footer from './components/Footer';
+
 import { sampleRecipes } from './data/sampleRecipes';
 import { useAuth } from './hooks/useAuth';
 
@@ -218,7 +219,6 @@ function Home() {
                 <div className="p-6 bg-white rounded-2xl border border-slate-100 shadow-sm space-y-6">
 
                   {/* Categories */}
-                  {/* Categories */}
                   <div>
                     <h3 className="text-sm font-semibold text-slate-900 mb-3">Kategória</h3>
                     <div className="flex flex-wrap gap-2">
@@ -270,7 +270,7 @@ function Home() {
                           type="checkbox"
                           checked={isVeganFilter}
                           onChange={(e) => setIsVeganFilter(e.target.checked)}
-                          className="w-5 h-5 rounded border-slate-300 text-[#BD95A4] focus:ring-[#BD95A4]"
+                          className="w-5 h-5 rounded border-slate-300 accent-[#A1836C] focus:ring-[#A1836C]"
                         />
                         <span className="text-sm font-medium text-slate-700">Csak vegán receptek</span>
                       </label>
@@ -288,15 +288,15 @@ function Home() {
                         <button
                           key={allergen}
                           onClick={() => toggleAllergen(allergen)}
-                          className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-colors border ${selectedAllergens.includes(allergen) ? 'bg-red-50 border-red-200 text-red-600' : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'}`}
+                          className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-colors border ${selectedAllergens.includes(allergen) ? 'bg-[#A1836C]/10 border-[#A1836C] text-[#A1836C]' : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'}`}
                         >
                           {selectedAllergens.includes(allergen) && <X size={14} />}
                           {allergen}
                         </button>
                       ))}
                     </div>
-                  </div>
 
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -314,36 +314,36 @@ function Home() {
             </div>
           )}
         </div>
-      </section>
+      </section >
     </>
   );
 }
 
-              function AppShell() {
+function AppShell() {
   const location = useLocation();
 
-              return (
-              <div className="relative flex min-h-screen flex-col overflow-hidden bg-slate-50 selection:bg-[#BD95A4]/20 selection:text-[#755463]">
-                <Navbar />
+  return (
+    <div className="relative flex min-h-screen flex-col overflow-hidden bg-slate-50 selection:bg-[#BD95A4]/20 selection:text-[#755463]">
+      <Navbar />
 
-                <main className="flex-1">
-                  <Routes location={location} key={location.pathname}>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/recipe/:id" element={<RecipeDetail />} />
-                    <Route path="/admin" element={<AdminDashboard />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/create-recipe" element={<CreateRecipe />} />
-                    <Route path="/edit-recipe/:id" element={<CreateRecipe />} />
-                  </Routes>
-                </main>
+      <main className="flex-1">
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<Home />} />
+          <Route path="/recipe/:id" element={<RecipeDetail />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/create-recipe" element={<CreateRecipe />} />
+          <Route path="/edit-recipe/:id" element={<CreateRecipe />} />
+        </Routes>
+      </main>
 
-                <Footer />
-              </div>
-              );
+      <Footer />
+    </div>
+  );
 }
 
-              export default function App() {
+export default function App() {
   return <AppShell />;
 }

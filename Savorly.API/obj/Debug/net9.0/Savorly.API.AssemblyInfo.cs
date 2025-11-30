@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Savorly.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+53ea126e202aeba3656af34e3eac1ac48d77f352")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c7e12fb16c96970d48d8cb5d1e4ff90da51e947e")]
 [assembly: System.Reflection.AssemblyProductAttribute("Savorly.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Savorly.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
