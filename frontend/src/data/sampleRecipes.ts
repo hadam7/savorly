@@ -12,6 +12,7 @@ export type SampleRecipe = {
   instructions: string[];
   createdAt?: string;
   likes?: number;
+  difficulty?: string;
 };
 
 export const sampleRecipes: SampleRecipe[] = [

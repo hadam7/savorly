@@ -1,4 +1,4 @@
-import { Clock, Users, Heart, ArrowUpRight } from 'lucide-react';
+import { Clock, Users, Heart, ArrowUpRight, ChefHat } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
@@ -16,6 +16,7 @@ export default function RecipeCard({ recipe, index = 0 }: RecipeCardProps) {
   const navigate = useNavigate();
   const [isFavorite, setIsFavorite] = useState(false);
   const [likesCount, setLikesCount] = useState(recipe.likes || 0);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -92,7 +93,7 @@ export default function RecipeCard({ recipe, index = 0 }: RecipeCardProps) {
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
+      transition={{ duration: 0.2, delay: index * 0.02 }}
       className="group relative h-full cursor-pointer"
       onClick={handleCardClick}
     >
@@ -100,17 +101,30 @@ export default function RecipeCard({ recipe, index = 0 }: RecipeCardProps) {
         {/* Image Container */}
         <div className="relative h-64 shrink-0 overflow-hidden">
           <div className="absolute inset-0 bg-slate-900/10 group-hover:bg-slate-900/0 transition-colors duration-500 z-10" />
-          <img
-            src={recipe.imageUrl}
-            alt={recipe.title}
-            className="h-full w-full object-cover transition-transform duration-700 will-change-transform group-hover:scale-110"
-          />
+          {/* Image or Fallback */}
+          {imageError ? (
+            <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-[#BD95A4] to-[#A1836C] text-white">
+              <ChefHat size={64} strokeWidth={1.5} className="opacity-90" />
+            </div>
+          ) : (
+            <img
+              src={recipe.imageUrl}
+              alt={recipe.title}
+              className="h-full w-full object-cover transition-transform duration-700 will-change-transform group-hover:scale-110"
+              onError={() => setImageError(true)}
+            />
+          )}
 
           {/* Floating Category Badge */}
-          <div className="absolute top-4 left-4 z-20">
+          <div className="absolute top-4 left-4 z-20 flex gap-2">
             <span className="px-3 py-1.5 text-xs font-bold tracking-wide text-white uppercase bg-white/20 backdrop-blur-md border border-white/30 rounded-full shadow-sm">
               {Array.isArray(recipe.category) ? recipe.category[0] : recipe.category}
             </span>
+            {recipe.isVegan && (
+              <span className="px-3 py-1.5 text-xs font-bold tracking-wide text-white uppercase bg-[#A1836C]/90 backdrop-blur-md border border-white/30 rounded-full shadow-sm">
+                Vegán
+              </span>
+            )}
           </div>
 
           {/* Quick Action Button */}

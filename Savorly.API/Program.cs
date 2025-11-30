@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Savorly.API.Data;
-
 using Microsoft.IdentityModel.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,8 +43,8 @@ builder.Services
         {
             ValidateIssuer = false,
             ValidateAudience = false,
-            ValidateLifetime = false,
-            ValidateIssuerSigningKey = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
             ValidIssuer = jwtIssuer,
             ValidAudience = jwtAudience,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
@@ -54,21 +53,27 @@ builder.Services
         {
             OnAuthenticationFailed = context =>
             {
-                Console.WriteLine("OnAuthenticationFailed: " + context.Exception.Message);
+                Console.WriteLine("Authentication Failed: " + context.Exception.Message);
                 return Task.CompletedTask;
             },
             OnTokenValidated = context =>
             {
-                Console.WriteLine("OnTokenValidated: " + context.SecurityToken);
+                Console.WriteLine("Token Validated for User: " + context.Principal.Identity.Name);
+                foreach (var claim in context.Principal.Claims)
+                {
+                    Console.WriteLine($"Claim: {claim.Type} = {claim.Value}");
+                }
                 return Task.CompletedTask;
             },
             OnChallenge = context =>
             {
-                Console.WriteLine("OnChallenge: " + context.Error + " " + context.ErrorDescription);
+                Console.WriteLine("Authentication Challenge: " + context.Error + " " + context.ErrorDescription);
                 return Task.CompletedTask;
             }
         };
     });
+
+Console.WriteLine($"JWT Configured - Issuer: {jwtIssuer}, Audience: {jwtAudience}");
 
 builder.Services.AddAuthorization();
 
@@ -106,33 +111,21 @@ app.UseCors();
 app.Use(async (context, next) =>
 {
     var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
-    if (authHeader != null && authHeader.StartsWith("Bearer "))
+    if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
     {
         var token = authHeader.Substring("Bearer ".Length).Trim();
-        try
+        // Remove any potential quotes or whitespace
+        token = token.Replace("\"", "").Replace("'", "");
+        context.Request.Headers["Authorization"] = $"Bearer {token}";
+        
+        if (token.Contains("."))
         {
-            var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
-            var keyBytes = Encoding.UTF8.GetBytes(jwtKey);
-            var validationParameters = new TokenValidationParameters
-            {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
-                ValidateIssuer = false, // Simplified for now
-                ValidateAudience = false, // Simplified for now
-                ValidIssuer = jwtIssuer,
-                ValidAudience = jwtAudience,
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero
-            };
-
-            var principal = handler.ValidateToken(token, validationParameters, out var validatedToken);
-            context.User = principal;
-            Console.WriteLine($"Custom Auth Success: {principal.Identity.Name}, Role: {principal.FindFirst(ClaimTypes.Role)?.Value}");
+            var headerPart = token.Split('.')[0];
+            var bytes = Encoding.UTF8.GetBytes(headerPart);
+            Console.WriteLine($"[Middleware] Header Bytes: {BitConverter.ToString(bytes)}");
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Custom Auth Failed: {ex.Message}");
-        }
+        
+        Console.WriteLine($"[Middleware] Sanitized Token: {token.Substring(0, Math.Min(10, token.Length))}...");
     }
     await next();
 });

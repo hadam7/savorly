@@ -162,7 +162,7 @@ export default function Profile() {
                         {likedRecipes.length > 0 ? (
                             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
                                 {likedRecipes.map((recipe, idx) => (
-                                    <div key={recipe.id} className="h-[400px]">
+                                    <div key={recipe.id}>
                                         <RecipeCard recipe={recipe} index={idx} />
                                     </div>
                                 ))}
@@ -187,7 +187,7 @@ export default function Profile() {
                         {myRecipes.length > 0 ? (
                             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
                                 {myRecipes.map((recipe, idx) => (
-                                    <div key={recipe.id} className="h-[400px]">
+                                    <div key={recipe.id}>
                                         <RecipeCard recipe={recipe} index={idx} />
                                     </div>
                                 ))}

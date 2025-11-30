@@ -110,7 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     return (
-        <AuthContext.Provider value={{ user, authenticated, loading, login, register, logout, token: localStorage.getItem('savorly_token') }}>
+        <AuthContext.Provider value={{ user, authenticated, loading, login, register, logout, token: localStorage.getItem('savorly_token')?.replace(/"/g, '').trim() || null }}>
             {children}
         </AuthContext.Provider>
     );

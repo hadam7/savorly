@@ -18,6 +18,8 @@ export default function CreateRecipe() {
     const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
     const [ingredients, setIngredients] = useState<string[]>(['']);
     const [instructions, setInstructions] = useState<string[]>(['']);
+    const [isVegan, setIsVegan] = useState(false);
+    const [difficulty, setDifficulty] = useState('Közepes');
 
     const availableAllergens = ['Glutén', 'Tej', 'Tojás', 'Mogyoró', 'Szója', 'Hal', 'Szezámmag', 'Diófélék', 'Zeller', 'Mustár'];
 
@@ -39,6 +41,8 @@ export default function CreateRecipe() {
                     setSelectedAllergens(recipe.allergens || []);
                     setIngredients(recipe.ingredients.length > 0 ? recipe.ingredients : ['']);
                     setInstructions(recipe.instructions.length > 0 ? recipe.instructions : ['']);
+                    setIsVegan(recipe.isVegan);
+                    setDifficulty(recipe.difficulty || 'Közepes');
                 }
             } catch (error) {
                 console.error('Failed to load data', error);
@@ -114,11 +118,11 @@ export default function CreateRecipe() {
             prepTimeMinutes: parseInt(prepTime) || 0,
             servings: parseInt(servings) || 1,
             categoryIds: selectedCategoryIds,
-            isVegan: selectedCategoryIds.some(id => availableCategories.find(c => c.id === id)?.name === 'Vegán'),
+            isVegan: isVegan,
             allergens: selectedAllergens,
             ingredients: ingredients.filter(i => i.trim() !== ''),
             instructions: instructions.filter(i => i.trim() !== ''),
-            difficulty: 'Medium' // Default
+            difficulty: difficulty
         };
 
         try {
@@ -267,6 +271,32 @@ export default function CreateRecipe() {
                             </div>
 
                             <div>
+                                <label className="mb-2 block text-sm font-semibold text-slate-700">Nehézség</label>
+                                <select
+                                    value={difficulty}
+                                    onChange={(e) => setDifficulty(e.target.value)}
+                                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 focus:border-[#BD95A4] focus:outline-none focus:ring-1 focus:ring-[#BD95A4]"
+                                >
+                                    <option value="Könnyű">Könnyű</option>
+                                    <option value="Közepes">Közepes</option>
+                                    <option value="Nehéz">Nehéz</option>
+                                </select>
+                            </div>
+
+
+                            <div>
+                                <label className="flex items-center gap-3 p-4 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer hover:bg-slate-100 transition-colors">
+                                    <input
+                                        type="checkbox"
+                                        checked={isVegan}
+                                        onChange={(e) => setIsVegan(e.target.checked)}
+                                        className="w-5 h-5 rounded border-slate-300 text-[#BD95A4] focus:ring-[#BD95A4] accent-[#BD95A4]"
+                                    />
+                                    <span className="font-semibold text-slate-700">Vegán recept</span>
+                                </label>
+                            </div>
+
+                            <div>
                                 <label className="mb-2 block text-sm font-semibold text-slate-700">Allergének</label>
                                 <div className="flex flex-wrap gap-2">
                                     {availableAllergens.map(allergen => (
@@ -374,7 +404,7 @@ export default function CreateRecipe() {
                         </div>
                     </form>
                 </div>
-            </div>
-        </section>
+            </div >
+        </section >
     );
 }

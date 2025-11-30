@@ -24,11 +24,13 @@ function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
+  const [isVeganFilter, setIsVeganFilter] = useState(false);
+  const [difficultyFilter, setDifficultyFilter] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<'popular' | 'newest' | 'oldest'>('popular');
   const [showFilters, setShowFilters] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
 
-  const availableCategories = ['Reggeli', 'Ebéd', 'Vacsora', 'Desszert', 'Leves', 'Főétel', 'Egytálétel', 'Könnyű', 'Vegetáriánus', 'Vegán', 'Indiai', 'Olasz', 'Előétel', 'Tészta'];
+  const availableCategories = ['Reggeli', 'Ebéd', 'Vacsora', 'Desszert', 'Leves', 'Főétel', 'Egytálétel', 'Könnyű', 'Vegetáriánus', 'Indiai', 'Olasz', 'Előétel', 'Tészta'];
   const availableAllergens = ['Glutén', 'Tej', 'Tojás', 'Mogyoró', 'Szója', 'Hal', 'Szezámmag', 'Diófélék', 'Zeller', 'Mustár'];
 
   const sortOptions = [
@@ -45,18 +47,23 @@ function Home() {
         const mappedRecipes = backendRecipes.map(r => ({
           ...r,
           instructions: [],
-          servings: 4,
-          isVegan: false,
+          servings: r.servings || 4,
+          isVegan: r.isVegan,
           allergens: [],
           ingredients: [],
           createdAt: new Date().toISOString(),
           category: r.categories,
           author: 'Savorly Chef',
           likes: r.likes,
-          prepTime: r.prepTimeMinutes || 0
+          prepTime: r.prepTimeMinutes || 0,
+          difficulty: r.difficulty || 'Közepes'
         }));
 
-        setAllRecipes([...mappedRecipes, ...sampleRecipes] as any);
+        if (mappedRecipes.length > 0) {
+          setAllRecipes(mappedRecipes as any);
+        } else {
+          setAllRecipes(sampleRecipes);
+        }
       } catch (e) {
         console.error('Failed to load recipes', e);
         setAllRecipes(sampleRecipes);
@@ -93,6 +100,16 @@ function Home() {
       });
     }
 
+    // Vegan Filter
+    if (isVeganFilter) {
+      result = result.filter(r => r.isVegan);
+    }
+
+    // Difficulty Filter
+    if (difficultyFilter) {
+      result = result.filter(r => r.difficulty === difficultyFilter);
+    }
+
     // Sort
     result.sort((a, b) => {
       if (sortBy === 'popular') {
@@ -105,7 +122,7 @@ function Home() {
     });
 
     return result;
-  }, [allRecipes, searchQuery, selectedCategory, selectedAllergens, sortBy]);
+  }, [allRecipes, searchQuery, selectedCategory, selectedAllergens, sortBy, isVeganFilter, difficultyFilter]);
 
   const toggleAllergen = (allergen: string) => {
     setSelectedAllergens(prev =>
@@ -201,6 +218,7 @@ function Home() {
                 <div className="p-6 bg-white rounded-2xl border border-slate-100 shadow-sm space-y-6">
 
                   {/* Categories */}
+                  {/* Categories */}
                   <div>
                     <h3 className="text-sm font-semibold text-slate-900 mb-3">Kategória</h3>
                     <div className="flex flex-wrap gap-2">
@@ -219,6 +237,43 @@ function Home() {
                           {cat}
                         </button>
                       ))}
+                    </div>
+                  </div>
+
+                  {/* Difficulty & Vegan */}
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <h3 className="text-sm font-semibold text-slate-900 mb-3">Nehézség</h3>
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          onClick={() => setDifficultyFilter(null)}
+                          className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${!difficultyFilter ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                        >
+                          Összes
+                        </button>
+                        {['Könnyű', 'Közepes', 'Nehéz'].map(diff => (
+                          <button
+                            key={diff}
+                            onClick={() => setDifficultyFilter(difficultyFilter === diff ? null : diff)}
+                            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${difficultyFilter === diff ? 'bg-[#BD95A4] text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                          >
+                            {diff}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="text-sm font-semibold text-slate-900 mb-3">Egyéb</h3>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={isVeganFilter}
+                          onChange={(e) => setIsVeganFilter(e.target.checked)}
+                          className="w-5 h-5 rounded border-slate-300 text-[#BD95A4] focus:ring-[#BD95A4]"
+                        />
+                        <span className="text-sm font-medium text-slate-700">Csak vegán receptek</span>
+                      </label>
                     </div>
                   </div>
 
@@ -259,7 +314,7 @@ function Home() {
             </div>
           )}
         </div>
-      </section>
+      </section >
 
       <section className="bg-white py-20 border-y border-slate-100">
         <div className="mx-auto max-w-6xl px-4">
@@ -284,7 +339,7 @@ function Home() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
+                transition={{ delay: idx * 0.05 }}
                 className="group relative p-6 bg-slate-50 rounded-3xl border border-slate-100 transition-all duration-300 hover:bg-white hover:shadow-xl hover:shadow-slate-200/50 hover:-translate-y-1"
               >
                 <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${cat.color} flex items-center justify-center text-2xl mb-4 shadow-sm group-hover:scale-110 transition-transform duration-300`}>

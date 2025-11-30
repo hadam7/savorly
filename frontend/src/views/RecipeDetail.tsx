@@ -1,7 +1,7 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { sampleRecipes } from '../data/sampleRecipes';
-import { ArrowLeft, Clock, Users, Heart, Check, Trash2, Edit } from 'lucide-react';
+import { ArrowLeft, Clock, Users, Heart, Check, Trash2, Edit, ChefHat } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { fetchRecipeById, deleteRecipe } from '../api';
 
@@ -14,6 +14,7 @@ export default function RecipeDetail() {
   const [likesCount, setLikesCount] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     const loadRecipe = async () => {
@@ -168,11 +169,18 @@ export default function RecipeDetail() {
       {/* Hero Image */}
       <div className="relative h-[40vh] w-full overflow-hidden md:h-[50vh]">
         <div className="absolute inset-0 bg-slate-900/20" />
-        <img
-          src={recipe.imageUrl}
-          alt={recipe.title}
-          className="h-full w-full object-cover"
-        />
+        {imageError ? (
+          <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-[#BD95A4] to-[#A1836C] text-white">
+            <ChefHat size={120} strokeWidth={1} className="opacity-90" />
+          </div>
+        ) : (
+          <img
+            src={recipe.imageUrl}
+            alt={recipe.title}
+            className="h-full w-full object-cover"
+            onError={() => setImageError(true)}
+          />
+        )}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-slate-900/80 to-transparent p-8 md:p-12">
           <div className="mx-auto max-w-4xl">
             <span className="mb-4 inline-block rounded-full bg-[#BD95A4] px-4 py-1.5 text-sm font-semibold text-white shadow-sm">
@@ -186,8 +194,8 @@ export default function RecipeDetail() {
       <div className="mx-auto -mt-10 max-w-4xl px-4 relative z-10">
         <div className="rounded-3xl bg-white p-8 shadow-xl shadow-slate-200/20 md:p-12">
           {/* Meta Data & Actions */}
-          <div className="mb-8 flex flex-wrap items-center justify-between gap-6 border-b border-slate-100 pb-8">
-            <div className="flex gap-8">
+          <div className="mb-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-slate-100 pb-8">
+            <div className="flex flex-wrap gap-4 md:gap-8">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-50 text-[#BD95A4]">
                   <Clock size={20} />
@@ -204,6 +212,15 @@ export default function RecipeDetail() {
                 <div>
                   <p className="text-xs font-medium text-slate-500">Adagok</p>
                   <p className="font-semibold text-slate-900">{recipe.servings} fő</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-50 text-slate-600">
+                  <ChefHat size={20} />
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-slate-500">Nehézség</p>
+                  <p className="font-semibold text-slate-900">{recipe.difficulty || 'Közepes'}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -251,7 +268,7 @@ export default function RecipeDetail() {
 
               <div className="flex flex-wrap justify-end gap-2">
                 {recipe.isVegan && (
-                  <span className="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
+                  <span className="inline-flex items-center rounded-full bg-[#A1836C]/10 px-3 py-1 text-xs font-medium text-[#A1836C]">
                     Vegán
                   </span>
                 )}
