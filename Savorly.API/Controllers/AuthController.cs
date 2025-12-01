@@ -86,6 +86,14 @@ public class AuthController : ControllerBase
         });
     }
 
+    [HttpPost("logout")]
+    public IActionResult Logout()
+    {
+        // For JWT, logout is handled client-side by removing the token.
+        // This endpoint exists for API completeness or future cookie-based auth.
+        return Ok(new { message = "Logged out successfully" });
+    }
+
     [HttpGet("me")]
     [Authorize]
     public async Task<ActionResult<object>> Me()

@@ -53,40 +53,50 @@ public class RecipesController : ControllerBase
     [AllowAnonymous]
     public async Task<ActionResult<RecipeDetailDto>> GetById(int id)
     {
-        var recipe = await _db.Recipes
-            .Include(r => r.RecipeCategories)
-            .Include(r => r.User)
-            .FirstOrDefaultAsync(r => r.Id == id);
-
-        if (recipe == null) return NotFound();
-
-        var dto = new RecipeDetailDto
+        try
         {
-            Id = recipe.Id,
-            Title = recipe.Title,
-            Description = recipe.Description,
-            Instructions = !string.IsNullOrEmpty(recipe.InstructionsJson) 
-                ? JsonSerializer.Deserialize<List<string>>(recipe.InstructionsJson) ?? new List<string>()
-                : new List<string> { recipe.Instructions ?? "" },
-            PrepTimeMinutes = recipe.PrepTimeMinutes,
-            Difficulty = recipe.Difficulty,
-            ImageUrl = recipe.ImageUrl,
-            Servings = recipe.Servings,
-            IsVegan = recipe.IsVegan,
-            Allergens = !string.IsNullOrEmpty(recipe.Allergens)
-                ? JsonSerializer.Deserialize<List<string>>(recipe.Allergens) ?? new List<string>()
-                : new List<string>(),
-            Ingredients = !string.IsNullOrEmpty(recipe.Ingredients)
-                ? JsonSerializer.Deserialize<List<string>>(recipe.Ingredients) ?? new List<string>()
-                : new List<string>(),
-            AuthorName = recipe.User?.UserName,
-            CreatedAt = recipe.CreatedAt,
-            CategoryIds = recipe.RecipeCategories.Select(rc => rc.CategoryId).ToList(),
-            Categories = recipe.RecipeCategories.Select(rc => rc.Category.Name).ToList(),
-            Likes = recipe.Likes
-        };
+            var recipe = await _db.Recipes
+                .Include(r => r.RecipeCategories)
+                .ThenInclude(rc => rc.Category) // Ensure Category is included!
+                .Include(r => r.User)
+                .FirstOrDefaultAsync(r => r.Id == id);
 
-        return Ok(dto);
+            if (recipe == null) return NotFound();
+
+            var dto = new RecipeDetailDto
+            {
+                Id = recipe.Id,
+                Title = recipe.Title,
+                Description = recipe.Description,
+                Instructions = !string.IsNullOrEmpty(recipe.InstructionsJson) 
+                    ? JsonSerializer.Deserialize<List<string>>(recipe.InstructionsJson) ?? new List<string>()
+                    : new List<string> { recipe.Instructions ?? "" },
+                PrepTimeMinutes = recipe.PrepTimeMinutes,
+                Difficulty = recipe.Difficulty,
+                ImageUrl = recipe.ImageUrl,
+                Servings = recipe.Servings,
+                IsVegan = recipe.IsVegan,
+                Allergens = !string.IsNullOrEmpty(recipe.Allergens)
+                    ? JsonSerializer.Deserialize<List<string>>(recipe.Allergens) ?? new List<string>()
+                    : new List<string>(),
+                Ingredients = !string.IsNullOrEmpty(recipe.Ingredients)
+                    ? JsonSerializer.Deserialize<List<string>>(recipe.Ingredients) ?? new List<string>()
+                    : new List<string>(),
+                AuthorName = recipe.User?.UserName,
+                CreatedAt = recipe.CreatedAt,
+                CategoryIds = recipe.RecipeCategories.Select(rc => rc.CategoryId).ToList(),
+                Categories = recipe.RecipeCategories.Select(rc => rc.Category?.Name ?? "Unknown").ToList(),
+                Likes = recipe.Likes
+            };
+
+            return Ok(dto);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in GetById({id}): {ex.Message}");
+            Console.WriteLine(ex.StackTrace);
+            return StatusCode(500, "Internal server error");
+        }
     }
 
     [HttpPost]

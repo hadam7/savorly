@@ -33,32 +33,35 @@ export default function Register() {
   return (
     <section className="mx-auto flex max-w-5xl flex-col items-center gap-10 px-4 pt-32 pb-10 md:flex-row-reverse md:items-stretch animate-fade-up">
       <div className="hidden flex-1 md:block">
-        <div className="glass-card relative h-full overflow-hidden p-6">
-          <div className="pointer-events-none absolute -right-16 -top-10 h-44 w-44 rounded-full bg-[#BD95A4]/45 blur-3xl" />
-          <div className="pointer-events-none absolute -left-12 bottom-0 h-52 w-52 rounded-full bg-[#A1836C]/30 blur-3xl" />
+        <div className="relative h-full overflow-hidden rounded-3xl bg-[#FDF8F6] shadow-2xl">
+          <div className="absolute inset-0">
+            <img
+              src="https://images.unsplash.com/photo-1507048331197-7d4ac70811cf?auto=format&fit=crop&w=1000&q=80"
+              alt="Cooking background"
+              className="h-full w-full object-cover opacity-80"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#FDF8F6] via-[#FDF8F6]/90 to-transparent" />
+          </div>
 
-          <h2 className="relative text-2xl font-semibold text-[#554040]">Csatlakozz a Savorly-hoz!</h2>
-          <p className="relative mt-2 text-sm text-slate-600">
-            Hozz létre egy fiókot, hogy elmenthesd a kedvenc receptjeidet, és mindig kéznél legyenek.
-          </p>
+          <div className="relative flex h-full flex-col justify-end p-10">
+            <h2 className="mb-4 text-3xl font-bold leading-tight text-slate-900">
+              Kezdd el a <br />
+              <span className="text-[#BD95A4]">kulináris utazást</span>
+            </h2>
+            <p className="mb-8 text-slate-600 leading-relaxed font-medium">
+              Regisztrálj ingyenesen, és férj hozzá exkluzív funkciókhoz.
+              Rendezd receptjeidet, és főzz szenvedéllyel!
+            </p>
 
-          <div className="relative mt-6 grid gap-3 text-sm">
-            <div className="flex items-center justify-between rounded-lg bg-white/80 px-3 py-2 shadow-sm">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">Mentett receptek</p>
-                <p className="text-sm font-semibold text-slate-900">Mindig kéznél</p>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="rounded-xl bg-white/60 p-3 backdrop-blur-sm shadow-sm border border-white/50">
+                <p className="text-2xl font-bold text-[#BD95A4]">0Ft</p>
+                <p className="text-xs text-slate-600">Ingyenes használat</p>
               </div>
-              <span className="rounded-full bg-[#F4DDDC] px-3 py-1 text-[0.65rem] font-semibold text-[#554040]">
-                Kedvencek
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between rounded-lg bg-gradient-to-r from-[#BD95A4]/12 to-[#A1836C]/12 px-3 py-2 shadow-sm">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">Kategóriák</p>
-                <p className="text-sm font-semibold text-slate-900">Teljes kontroll</p>
+              <div className="rounded-xl bg-white/60 p-3 backdrop-blur-sm shadow-sm border border-white/50">
+                <p className="text-2xl font-bold text-[#BD95A4]">∞</p>
+                <p className="text-xs text-slate-600">Korlátlan recept</p>
               </div>
-              <span className="text-[0.7rem] text-slate-600">Te döntesz, hogyan rendezed</span>
             </div>
           </div>
         </div>

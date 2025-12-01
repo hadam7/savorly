@@ -16,9 +16,12 @@ export default function RecipeDetail() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
     const loadRecipe = async () => {
       if (!id) return;
+      setError(null);
 
       try {
         const backendRecipe = await fetchRecipeById(parseInt(id));
@@ -36,13 +39,15 @@ export default function RecipeDetail() {
 
         setRecipe(mappedRecipe);
         setLikesCount(mappedRecipe.likes);
-      } catch (error) {
-        console.error('Failed to load recipe', error);
-        const sample = sampleRecipes.find(r => r.id === id);
+      } catch (err) {
+        console.error('Failed to load recipe', err);
+        // Try to find in sample recipes with loose comparison
+        const sample = sampleRecipes.find(r => String(r.id) === String(id));
         if (sample) {
           setRecipe(sample);
         } else {
-          navigate('/');
+          setError('A recept nem található.');
+          setRecipe(null);
         }
       }
     };
@@ -153,6 +158,21 @@ export default function RecipeDetail() {
         : [...prev, index]
     );
   };
+
+  if (error) {
+    return (
+      <div className="mx-auto max-w-4xl px-4 py-10 pt-32 text-center">
+        <h2 className="text-2xl font-bold text-slate-900 mb-4">Hoppá!</h2>
+        <p className="text-slate-600 mb-6">{error}</p>
+        <button
+          onClick={() => navigate('/')}
+          className="rounded-full bg-[#BD95A4] px-6 py-2.5 font-semibold text-white shadow-lg shadow-[#BD95A4]/20 transition-all hover:bg-[#A17A8C] hover:shadow-xl hover:-translate-y-0.5"
+        >
+          Vissza a főoldalra
+        </button>
+      </div>
+    );
+  }
 
   if (!recipe) {
     return (

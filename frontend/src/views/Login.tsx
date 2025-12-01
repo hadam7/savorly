@@ -32,29 +32,26 @@ export default function Login() {
   return (
     <section className="mx-auto flex max-w-5xl flex-col items-center gap-10 px-4 pt-32 pb-10 md:flex-row md:items-stretch animate-fade-up">
       <div className="hidden flex-1 md:block">
-        <div className="glass-card relative h-full overflow-hidden p-6">
-          <div className="pointer-events-none absolute -left-10 -top-12 h-40 w-40 rounded-full bg-[#BD95A4]/35 blur-3xl" />
-          <div className="pointer-events-none absolute -right-20 bottom-0 h-52 w-52 rounded-full bg-[#A1836C]/20 blur-3xl" />
+        <div className="relative h-full overflow-hidden rounded-3xl bg-[#FDF8F6] shadow-2xl">
+          <div className="absolute inset-0">
+            <img
+              src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=1000&q=80"
+              alt="Healthy food"
+              className="h-full w-full object-cover opacity-80"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#FDF8F6] via-[#FDF8F6]/90 to-transparent" />
+          </div>
 
-          <h2 className="relative text-2xl font-semibold text-[#554040]">Üdv újra a Savorly-ban!</h2>
-          <p className="relative mt-2 text-sm text-slate-600">
-            Lépj be, és folytasd ott, ahol abbahagytad: a kedvenc receptjeid csak egy kattintásnyira vannak.
-          </p>
-
-          <ul className="relative mt-6 space-y-3 text-sm text-slate-700">
-            <li className="flex items-start gap-2">
-              <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#77BA7B]" />
-              <span>Mentett receptek gyors elérése.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#77BA7B]" />
-              <span>Kategóriák, amik rendszert visznek a főzésbe.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#77BA7B]" />
-              <span>Reszponzív felület mobilra és asztalira.</span>
-            </li>
-          </ul>
+          <div className="relative flex h-full flex-col justify-end p-10">
+            <h2 className="mb-4 text-3xl font-bold leading-tight text-slate-900">
+              Fedezd fel az ízek <br />
+              <span className="text-[#BD95A4]">új világát</span>
+            </h2>
+            <p className="mb-8 text-slate-600 leading-relaxed font-medium">
+              Csatlakozz közösségünkhöz, és mentsd el kedvenc receptjeidet egy helyen.
+              Inspirálódj minden nap!
+            </p>
+          </div>
         </div>
       </div>
 
