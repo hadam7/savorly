@@ -1,7 +1,7 @@
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { sampleRecipes } from '../data/sampleRecipes';
-import { ArrowLeft, Clock, Users, Heart, Check, Trash2, Edit, ChefHat } from 'lucide-react';
+import { Clock, Users, Heart, Check, Trash2, Edit, ChefHat } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { fetchRecipeById, deleteRecipe } from '../api';
 

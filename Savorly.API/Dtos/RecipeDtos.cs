@@ -12,7 +12,7 @@ public class RecipeListItemDto
     public string? Difficulty { get; set; }
     public string? AuthorName { get; set; }
     public List<string> Categories { get; set; } = new();
-    public int Likes { get; set; } // Placeholder for now
+    public int Likes { get; set; }
     public bool IsVegan { get; set; }
     public List<string> Allergens { get; set; } = new();
 }

@@ -53,27 +53,18 @@ builder.Services
         {
             OnAuthenticationFailed = context =>
             {
-                Console.WriteLine("Authentication Failed: " + context.Exception.Message);
                 return Task.CompletedTask;
             },
             OnTokenValidated = context =>
             {
-                Console.WriteLine("Token Validated for User: " + context.Principal.Identity.Name);
-                foreach (var claim in context.Principal.Claims)
-                {
-                    Console.WriteLine($"Claim: {claim.Type} = {claim.Value}");
-                }
                 return Task.CompletedTask;
             },
             OnChallenge = context =>
             {
-                Console.WriteLine("Authentication Challenge: " + context.Error + " " + context.ErrorDescription);
                 return Task.CompletedTask;
             }
         };
     });
-
-Console.WriteLine($"JWT Configured - Issuer: {jwtIssuer}, Audience: {jwtAudience}");
 
 builder.Services.AddAuthorization();
 
@@ -117,15 +108,6 @@ app.Use(async (context, next) =>
         // Remove any potential quotes or whitespace
         token = token.Replace("\"", "").Replace("'", "");
         context.Request.Headers["Authorization"] = $"Bearer {token}";
-        
-        if (token.Contains("."))
-        {
-            var headerPart = token.Split('.')[0];
-            var bytes = Encoding.UTF8.GetBytes(headerPart);
-            Console.WriteLine($"[Middleware] Header Bytes: {BitConverter.ToString(bytes)}");
-        }
-        
-        Console.WriteLine($"[Middleware] Sanitized Token: {token.Substring(0, Math.Min(10, token.Length))}...");
     }
     await next();
 });

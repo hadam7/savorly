@@ -37,7 +37,7 @@ export async function register(userName: string, email: string, password: string
 
 export async function fetchMe(token: string) {
   const cleanToken = token.replace(/"/g, '').trim();
-  console.log('Sending token for fetchMe:', cleanToken);
+
   const res = await fetch(`${API_BASE_URL}/auth/me`, {
     headers: {
       Authorization: `Bearer ${cleanToken}`,
@@ -123,7 +123,7 @@ export async function fetchRecipeById(id: number): Promise<Recipe> {
 
 export async function createRecipe(token: string, data: CreateRecipeDto): Promise<Recipe> {
   const cleanToken = token.replace(/"/g, '').trim();
-  console.log('Sending token for createRecipe:', cleanToken);
+
   const res = await fetch(`${API_BASE_URL}/recipes`, {
     method: 'POST',
     headers: {

@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { ChefHat, Home, BookOpen, LogIn, UserPlus, Search, User, PlusCircle, Wrench } from 'lucide-react';
+import { ChefHat, Home, BookOpen, LogIn, UserPlus, User, PlusCircle, Wrench } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 

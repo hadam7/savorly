@@ -66,7 +66,6 @@ function Home() {
           setAllRecipes(sampleRecipes);
         }
       } catch (e) {
-        console.error('Failed to load recipes', e);
         setAllRecipes(sampleRecipes);
       }
     };
@@ -77,21 +76,6 @@ function Home() {
   const filteredRecipes = useMemo(() => {
     let result = [...allRecipes];
 
-    // Search
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(r => r.title.toLowerCase().includes(query));
-    }
-
-    // Category Filter
-    if (selectedCategory) {
-      result = result.filter(r => {
-        if (Array.isArray(r.category)) {
-          return r.category.includes(selectedCategory);
-        }
-        return r.category === selectedCategory;
-      });
-    }
 
     // Allergen Filter (Exclude if recipe has selected allergen)
     if (selectedAllergens.length > 0) {

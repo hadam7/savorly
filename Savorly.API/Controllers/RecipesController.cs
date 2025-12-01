@@ -9,7 +9,6 @@ namespace Savorly.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-// [Authorize]
 public class RecipesController : ControllerBase
 {
     private readonly AppDbContext _db;
@@ -91,7 +90,6 @@ public class RecipesController : ControllerBase
     }
 
     [HttpPost]
-    // [Authorize]
     public async Task<ActionResult> Create(RecipeCreateUpdateDto dto)
     {
         var userName = User.Identity?.Name ?? "UserA"; // Fallback for testing
@@ -132,7 +130,6 @@ public class RecipesController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    // [Authorize]
     public async Task<IActionResult> Update(int id, RecipeCreateUpdateDto dto)
     {
         var userName = User.Identity?.Name ?? "UserA"; // Fallback for testing
@@ -175,7 +172,6 @@ public class RecipesController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
-    // [Authorize]
     public async Task<IActionResult> Delete(int id)
     {
         var userName = User.Identity?.Name ?? "UserA"; // Fallback for testing
