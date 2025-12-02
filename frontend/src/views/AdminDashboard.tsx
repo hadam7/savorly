@@ -15,19 +15,19 @@ interface UserData {
 }
 
 export default function AdminDashboard() {
-    const { user, token } = useAuth();
+    const { user } = useAuth();
     const navigate = useNavigate();
     const [users, setUsers] = useState<UserData[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
 
-    // Recipe Management State
+
     const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
     const [userRecipes, setUserRecipes] = useState<RecipeListItemDto[]>([]);
     const [recipesLoading, setRecipesLoading] = useState(false);
 
-    // Categories State
+
     const [showCategories, setShowCategories] = useState(false);
     const [categories, setCategories] = useState<any[]>([]);
     const [newCategoryName, setNewCategoryName] = useState('');
@@ -37,13 +37,12 @@ export default function AdminDashboard() {
 
     useEffect(() => {
         loadUsers();
-    }, [token]);
+    }, []);
 
     const loadUsers = async () => {
-        if (!token) return;
         try {
             setLoading(true);
-            const data = await fetchUsers(token);
+            const data = await fetchUsers();
             setUsers(data);
         } catch (err) {
             setError('Nem sikerült betölteni a felhasználókat.');
@@ -67,16 +66,16 @@ export default function AdminDashboard() {
 
     const handleCreateCategory = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!token || !newCategoryName.trim()) return;
+        if (!newCategoryName.trim()) return;
         try {
             const api = await import('../api');
 
             if (editingCategory) {
-                await api.updateCategory(token, editingCategory.id, newCategoryName);
+                await api.updateCategory(editingCategory.id, newCategoryName);
                 setCategories(categories.map(c => c.id === editingCategory.id ? { ...c, name: newCategoryName } : c));
                 setEditingCategory(null);
             } else {
-                const newCat = await api.createCategory(token, newCategoryName);
+                const newCat = await api.createCategory(newCategoryName);
                 setCategories([...categories, newCat]);
             }
             setNewCategoryName('');
@@ -97,10 +96,9 @@ export default function AdminDashboard() {
 
     const handleDeleteCategory = async (id: number) => {
         if (!window.confirm('Biztosan törölni szeretnéd ezt a kategóriát?')) return;
-        if (!token) return;
         try {
             const api = await import('../api');
-            await api.deleteCategory(token, id);
+            await api.deleteCategory(id);
             setCategories(categories.filter(c => c.id !== id));
         } catch (err) {
             alert('Hiba a kategória törlésekor.');
@@ -109,10 +107,9 @@ export default function AdminDashboard() {
 
     const handleDelete = async (id: number) => {
         if (!window.confirm('Biztosan törölni szeretnéd ezt a felhasználót?')) return;
-        if (!token) return;
 
         try {
-            await deleteUser(token, id);
+            await deleteUser(id);
             setUsers(users.filter(u => u.id !== id));
         } catch (err) {
             alert('Hiba történt a törlés során.');
@@ -120,9 +117,8 @@ export default function AdminDashboard() {
     };
 
     const handleToggleStatus = async (id: number) => {
-        if (!token) return;
         try {
-            const res = await toggleUserStatus(token, id);
+            const res = await toggleUserStatus(id);
             setUsers(users.map(u => u.id === id ? { ...u, isActive: res.isActive } : u));
         } catch (err) {
             alert('Hiba történt a státusz módosítása során.');
@@ -130,11 +126,10 @@ export default function AdminDashboard() {
     };
 
     const handleViewRecipes = async (userData: UserData) => {
-        if (!token) return;
         setSelectedUser(userData);
         setRecipesLoading(true);
         try {
-            const recipes = await fetchUserRecipes(token, userData.id);
+            const recipes = await fetchUserRecipes(userData.id);
             setUserRecipes(recipes);
         } catch (err) {
             alert('Nem sikerült betölteni a recepteket.');
@@ -146,9 +141,8 @@ export default function AdminDashboard() {
 
     const handleDeleteRecipe = async (recipeId: number) => {
         if (!window.confirm('Biztosan törölni szeretnéd ezt a receptet?')) return;
-        if (!token) return;
         try {
-            await deleteRecipe(token, recipeId);
+            await deleteRecipe(recipeId);
             setUserRecipes(userRecipes.filter(r => r.id !== recipeId));
         } catch (err) {
             alert('Hiba történt a recept törlése során.');
@@ -376,7 +370,7 @@ export default function AdminDashboard() {
                 </div>
             )}
 
-            {/* Recipes Modal */}
+
             <AnimatePresence>
                 {selectedUser && (
                     <motion.div

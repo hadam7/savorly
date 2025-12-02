@@ -12,7 +12,7 @@ interface RecipeCardProps {
 }
 
 export default function RecipeCard({ recipe, index = 0 }: RecipeCardProps) {
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [isFavorite, setIsFavorite] = useState(false);
   const [likesCount, setLikesCount] = useState(recipe.likes || 0);
@@ -43,7 +43,7 @@ export default function RecipeCard({ recipe, index = 0 }: RecipeCardProps) {
     e.preventDefault();
     e.stopPropagation();
 
-    if (!user || !token) {
+    if (!user) {
       navigate('/login');
       return;
     }
@@ -54,10 +54,10 @@ export default function RecipeCard({ recipe, index = 0 }: RecipeCardProps) {
       const recipeId = parseInt(String(recipe.id)); // Ensure number for API
 
       if (isFavorite) {
-        const res = await api.unlikeRecipe(token, recipeId);
+        const res = await api.unlikeRecipe(recipeId);
         newLikes = res.likes;
       } else {
-        const res = await api.likeRecipe(token, recipeId);
+        const res = await api.likeRecipe(recipeId);
         newLikes = res.likes;
       }
 

@@ -1,5 +1,5 @@
 import { Route, Routes, useLocation } from 'react-router-dom';
-import { fetchRecipes } from './api';
+import { fetchRecipes, fetchCategories } from './api';
 import { Plus, ArrowRight, Timer, BookOpen, Search, Filter, SortAsc, SortDesc, X, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useMemo } from 'react';
@@ -23,7 +23,7 @@ function Home() {
 
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
   const [isVeganFilter, setIsVeganFilter] = useState(false);
   const [difficultyFilter, setDifficultyFilter] = useState<string | null>(null);
@@ -31,7 +31,7 @@ function Home() {
   const [showFilters, setShowFilters] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
 
-  const availableCategories = ['Reggeli', 'Ebéd', 'Vacsora', 'Desszert', 'Leves', 'Főétel', 'Egytálétel', 'Könnyű', 'Vegetáriánus', 'Indiai', 'Olasz', 'Előétel', 'Tészta'];
+  const [categories, setCategories] = useState<string[]>([]);
   const availableAllergens = ['Glutén', 'Tej', 'Tojás', 'Mogyoró', 'Szója', 'Hal', 'Szezámmag', 'Diófélék', 'Zeller', 'Mustár'];
 
   const sortOptions = [
@@ -41,9 +41,14 @@ function Home() {
   ];
 
   useEffect(() => {
-    const loadRecipes = async () => {
+    const loadData = async () => {
       try {
-        const backendRecipes = await fetchRecipes();
+        const [backendRecipes, backendCategories] = await Promise.all([
+          fetchRecipes(),
+          fetchCategories()
+        ]);
+
+        setCategories(backendCategories.map(c => c.name));
 
         const mappedRecipes = backendRecipes.map(r => ({
           ...r,
@@ -66,16 +71,35 @@ function Home() {
           setAllRecipes(sampleRecipes);
         }
       } catch (e) {
+        console.error('Failed to load data', e);
         setAllRecipes(sampleRecipes);
       }
     };
 
-    loadRecipes();
+    loadData();
   }, []);
 
   const filteredRecipes = useMemo(() => {
     let result = [...allRecipes];
 
+    // Search Filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(r => r.title.toLowerCase().includes(query));
+    }
+
+    // Category Filter (AND logic)
+    if (selectedCategories.length > 0) {
+      result = result.filter(r => {
+        if (!r.category) return false;
+        // Check if recipe has ALL of the selected categories
+        if (Array.isArray(r.category)) {
+          return selectedCategories.every(cat => r.category.includes(cat));
+        }
+        // If recipe has only one category (string), it can only match if selectedCategories has only that one category
+        return selectedCategories.length === 1 && selectedCategories[0] === r.category;
+      });
+    }
 
     // Allergen Filter (Exclude if recipe has selected allergen)
     if (selectedAllergens.length > 0) {
@@ -107,11 +131,17 @@ function Home() {
     });
 
     return result;
-  }, [allRecipes, searchQuery, selectedCategory, selectedAllergens, sortBy, isVeganFilter, difficultyFilter]);
+  }, [allRecipes, searchQuery, selectedCategories, selectedAllergens, sortBy, isVeganFilter, difficultyFilter]);
 
   const toggleAllergen = (allergen: string) => {
     setSelectedAllergens(prev =>
       prev.includes(allergen) ? prev.filter(a => a !== allergen) : [...prev, allergen]
+    );
+  };
+
+  const toggleCategory = (category: string) => {
+    setSelectedCategories(prev =>
+      prev.includes(category) ? prev.filter(c => c !== category) : [...prev, category]
     );
   };
 
@@ -204,19 +234,22 @@ function Home() {
 
                   {/* Categories */}
                   <div>
-                    <h3 className="text-sm font-semibold text-slate-900 mb-3">Kategória</h3>
+                    <div className="flex items-center gap-2 mb-3">
+                      <h3 className="text-sm font-semibold text-slate-900">Kategória</h3>
+                      <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded">Többet is kiválaszthatsz</span>
+                    </div>
                     <div className="flex flex-wrap gap-2">
                       <button
-                        onClick={() => setSelectedCategory(null)}
-                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${!selectedCategory ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                        onClick={() => setSelectedCategories([])}
+                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${selectedCategories.length === 0 ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
                       >
                         Összes
                       </button>
-                      {availableCategories.map(cat => (
+                      {categories.map(cat => (
                         <button
                           key={cat}
-                          onClick={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
-                          className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${selectedCategory === cat ? 'bg-[#BD95A4] text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                          onClick={() => toggleCategory(cat)}
+                          className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${selectedCategories.includes(cat) ? 'bg-[#BD95A4] text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
                         >
                           {cat}
                         </button>

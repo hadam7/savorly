@@ -4,7 +4,7 @@ import { ArrowRight, Sparkles } from 'lucide-react';
 export default function Hero() {
     return (
         <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden px-4">
-            {/* Background Elements */}
+
             <div className="absolute inset-0 pointer-events-none">
                 <motion.div
                     animate={{

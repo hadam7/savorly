@@ -33,7 +33,7 @@ public static class DbInitializer
 
         context.SaveChanges();
 
-        // Users
+
         if (!context.Users.Any())
         {
             var hasher = new Microsoft.AspNetCore.Identity.PasswordHasher<User>();
@@ -62,7 +62,7 @@ public static class DbInitializer
             context.SaveChanges();
         }
 
-        // Recipes
+
         if (!context.Recipes.Any())
         {
             var user = context.Users.FirstOrDefault(u => u.UserName == "user");
@@ -70,7 +70,7 @@ public static class DbInitializer
             {
                 var recipes = new List<Recipe>();
 
-                // Helper to get category IDs
+
                 List<RecipeCategory> GetCats(string[] slugs)
                 {
                     var cats = context.Categories.Where(c => slugs.Contains(c.Name)).ToList();

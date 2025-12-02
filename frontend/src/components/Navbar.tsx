@@ -14,17 +14,17 @@ export default function Navbar() {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
 
-      // Determine if scrolled for styling
+
       setScrolled(currentScrollY > 20);
 
-      // Determine visibility
+
       if (currentScrollY < 20) {
         setIsVisible(true);
       } else if (currentScrollY > lastScrollY) {
-        // Scrolling down
+
         setIsVisible(false);
       } else {
-        // Scrolling up
+
         setIsVisible(true);
       }
 
@@ -50,7 +50,7 @@ export default function Navbar() {
           w-full max-w-6xl py-4
         `}
       >
-        {/* Logo Area */}
+
         <Link to="/" className="group flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#BD95A4] to-[#A1836C] text-white shadow-md shadow-[#BD95A4]/20 transition-transform duration-500 group-hover:rotate-12 group-hover:scale-110">
             <ChefHat size={20} strokeWidth={2.5} />
@@ -60,7 +60,7 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* Navigation Links */}
+
         <div className="flex items-center gap-2">
           <NavLink to="/" icon={<Home size={18} />} label="Főoldal" active={isActive('/') && location.hash !== '#browse'} />
           <NavLink
@@ -78,7 +78,7 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Auth Buttons */}
+
         <div className="flex items-center gap-3 pl-4 border-l border-slate-200/60">
           {authenticated ? (
             <Link

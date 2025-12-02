@@ -43,8 +43,7 @@ public class UsersController : ControllerBase
         var user = await _db.Users.FindAsync(id);
         if (user == null) return NotFound();
 
-        // Prevent deleting self? Maybe not strictly necessary but good practice.
-        // For now, simple delete.
+
         
         _db.Users.Remove(user);
         await _db.SaveChangesAsync();

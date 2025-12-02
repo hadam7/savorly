@@ -51,16 +51,12 @@ builder.Services
         };
         o.Events = new JwtBearerEvents
         {
-            OnAuthenticationFailed = context =>
+            OnMessageReceived = context =>
             {
-                return Task.CompletedTask;
-            },
-            OnTokenValidated = context =>
-            {
-                return Task.CompletedTask;
-            },
-            OnChallenge = context =>
-            {
+                if (context.Request.Cookies.ContainsKey("AuthToken"))
+                {
+                    context.Token = context.Request.Cookies["AuthToken"];
+                }
                 return Task.CompletedTask;
             }
         };
@@ -68,20 +64,21 @@ builder.Services
 
 builder.Services.AddAuthorization();
 
-// Allow local frontend (Vite) to access the API
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.WithOrigins("http://localhost:5173")
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+              .AllowCredentials();
     });
 });
 
 var app = builder.Build();
 
-// Ensure the SQLite database and tables are created based on the EF Core model
+
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -99,18 +96,8 @@ app.UseHttpsRedirection();
 
 app.UseCors();
 
-app.Use(async (context, next) =>
-{
-    var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
-    if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
-    {
-        var token = authHeader.Substring("Bearer ".Length).Trim();
-        // Remove any potential quotes or whitespace
-        token = token.Replace("\"", "").Replace("'", "");
-        context.Request.Headers["Authorization"] = $"Bearer {token}";
-    }
-    await next();
-});
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseAuthentication();
 app.UseAuthorization();

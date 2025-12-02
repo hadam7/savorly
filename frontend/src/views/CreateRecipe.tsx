@@ -105,11 +105,7 @@ export default function CreateRecipe() {
 
         if (!user) return;
 
-        const token = localStorage.getItem('savorly_token');
-        if (!token) {
-            navigate('/login');
-            return;
-        }
+        if (!user) return;
 
         const recipeData = {
             title,
@@ -127,12 +123,12 @@ export default function CreateRecipe() {
 
         try {
             if (id) {
-                // Update existing
-                await updateRecipe(token, parseInt(id), recipeData);
+
+                await updateRecipe(parseInt(id), recipeData);
                 navigate(`/recipe/${id}`);
             } else {
-                // Create new
-                await createRecipe(token, recipeData);
+
+                await createRecipe(recipeData);
                 navigate('/');
             }
         } catch (error) {
@@ -155,7 +151,7 @@ export default function CreateRecipe() {
                     <h1 className="mb-8 text-3xl font-bold text-slate-900">{id ? 'Recept szerkesztése' : 'Új recept létrehozása'}</h1>
 
                     <form onSubmit={handleSubmit} className="space-y-8">
-                        {/* Basic Info */}
+
                         <div className="space-y-6">
                             <div>
                                 <label className="mb-2 block text-sm font-semibold text-slate-700">Recept neve</label>
@@ -316,7 +312,7 @@ export default function CreateRecipe() {
                             </div>
                         </div>
 
-                        {/* Ingredients */}
+
                         <div>
                             <div className="mb-4 flex items-center justify-between">
                                 <label className="text-lg font-semibold text-slate-900">Hozzávalók</label>
@@ -353,7 +349,7 @@ export default function CreateRecipe() {
                             </div>
                         </div>
 
-                        {/* Instructions */}
+
                         <div>
                             <div className="mb-4 flex items-center justify-between">
                                 <label className="text-lg font-semibold text-slate-900">Elkészítés lépései</label>

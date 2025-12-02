@@ -48,9 +48,21 @@ public class AuthController : ControllerBase
         await _db.SaveChangesAsync();
 
         var token = GenerateJwtToken(user);
+        
+        var cookieOptions = new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddMinutes(60)
+        };
+        
+        Response.Cookies.Append("AuthToken", token, cookieOptions);
+        
         return Ok(new AuthResponse
         {
-            Token = token,
+
+            Token = null, 
             UserName = user.UserName,
             Role = user.Role
         });
@@ -78,9 +90,20 @@ public class AuthController : ControllerBase
         }
 
         var token = GenerateJwtToken(user);
+        
+        var cookieOptions = new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddMinutes(60)
+        };
+        
+        Response.Cookies.Append("AuthToken", token, cookieOptions);
+        
         return Ok(new AuthResponse
         {
-            Token = token,
+            Token = null,
             UserName = user.UserName,
             Role = user.Role
         });
@@ -89,8 +112,7 @@ public class AuthController : ControllerBase
     [HttpPost("logout")]
     public IActionResult Logout()
     {
-        // For JWT, logout is handled client-side by removing the token.
-        // This endpoint exists for API completeness or future cookie-based auth.
+        Response.Cookies.Delete("AuthToken");
         return Ok(new { message = "Logged out successfully" });
     }
 

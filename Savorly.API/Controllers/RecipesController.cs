@@ -57,7 +57,7 @@ public class RecipesController : ControllerBase
         {
             var recipe = await _db.Recipes
                 .Include(r => r.RecipeCategories)
-                .ThenInclude(rc => rc.Category) // Ensure Category is included!
+                .ThenInclude(rc => rc.Category)
                 .Include(r => r.User)
                 .FirstOrDefaultAsync(r => r.Id == id);
 
@@ -102,22 +102,18 @@ public class RecipesController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> Create(RecipeCreateUpdateDto dto)
     {
-        var userName = User.Identity?.Name ?? "UserA"; // Fallback for testing
-        var user = await _db.Users.FirstOrDefaultAsync(u => u.UserName == userName);
+        var userName = User.Identity?.Name;
+        if (userName == null) return Unauthorized();
 
-        if (user == null) 
-        {
-            user = new User { UserName = "UserA", Email = "usera@example.com", PasswordHash = "dummy", Role = "User", CreatedAt = DateTime.UtcNow };
-            _db.Users.Add(user);
-            await _db.SaveChangesAsync();
-        }
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.UserName == userName);
+        if (user == null) return Unauthorized();
 
         var recipe = new Recipe
         {
             Title = dto.Title,
             Description = dto.Description,
             InstructionsJson = JsonSerializer.Serialize(dto.Instructions),
-            Instructions = string.Join("\n", dto.Instructions), // Fallback
+            Instructions = string.Join("\n", dto.Instructions),
             PrepTimeMinutes = dto.PrepTimeMinutes,
             Difficulty = dto.Difficulty,
             ImageUrl = dto.ImageUrl,
@@ -142,14 +138,11 @@ public class RecipesController : ControllerBase
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, RecipeCreateUpdateDto dto)
     {
-        var userName = User.Identity?.Name ?? "UserA"; // Fallback for testing
+        var userName = User.Identity?.Name;
+        if (userName == null) return Unauthorized();
+
         var user = await _db.Users.FirstOrDefaultAsync(u => u.UserName == userName);
-        if (user == null) 
-        {
-            user = new User { UserName = "UserA", Email = "usera@example.com", PasswordHash = "dummy", Role = "User", CreatedAt = DateTime.UtcNow };
-            _db.Users.Add(user);
-            await _db.SaveChangesAsync();
-        }
+        if (user == null) return Unauthorized();
 
         var recipe = await _db.Recipes
             .Include(r => r.RecipeCategories)
@@ -157,7 +150,7 @@ public class RecipesController : ControllerBase
 
         if (recipe == null) return NotFound();
 
-        // Check ownership
+
         if (recipe.UserId != user.Id && user.Role != "Admin")
         {
             return Forbid();
@@ -184,19 +177,16 @@ public class RecipesController : ControllerBase
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var userName = User.Identity?.Name ?? "UserA"; // Fallback for testing
+        var userName = User.Identity?.Name;
+        if (userName == null) return Unauthorized();
+
         var user = await _db.Users.FirstOrDefaultAsync(u => u.UserName == userName);
-        if (user == null) 
-        {
-            user = new User { UserName = "UserA", Email = "usera@example.com", PasswordHash = "dummy", Role = "User", CreatedAt = DateTime.UtcNow };
-            _db.Users.Add(user);
-            await _db.SaveChangesAsync();
-        }
+        if (user == null) return Unauthorized();
 
         var recipe = await _db.Recipes.FindAsync(id);
         if (recipe == null) return NotFound();
 
-        // Check ownership
+
         if (recipe.UserId != user.Id && user.Role != "Admin")
         {
             return Forbid();

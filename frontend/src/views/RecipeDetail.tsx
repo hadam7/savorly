@@ -8,7 +8,7 @@ import { fetchRecipeById, deleteRecipe } from '../api';
 export default function RecipeDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const [recipe, setRecipe] = useState<any>(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
@@ -41,7 +41,7 @@ export default function RecipeDetail() {
         setLikesCount(mappedRecipe.likes);
       } catch (err) {
         console.error('Failed to load recipe', err);
-        // Try to find in sample recipes with loose comparison
+
         const sample = sampleRecipes.find(r => String(r.id) === String(id));
         if (sample) {
           setRecipe(sample);
@@ -55,7 +55,7 @@ export default function RecipeDetail() {
     loadRecipe();
   }, [id, navigate]);
 
-  // Load favorites
+
   useEffect(() => {
     if (user && id) {
       const savedFavorites = localStorage.getItem(`savorly_favorites_${user.userName}`);
@@ -73,7 +73,7 @@ export default function RecipeDetail() {
   }, [user, id]);
 
   const handleToggleFavorite = async () => {
-    if (!user || !token) {
+    if (!user) {
       navigate('/login');
       return;
     }
@@ -85,10 +85,10 @@ export default function RecipeDetail() {
       let newLikes = likesCount;
 
       if (isFavorite) {
-        const res = await api.unlikeRecipe(token, parseInt(id));
+        const res = await api.unlikeRecipe(parseInt(id));
         newLikes = res.likes;
       } else {
-        const res = await api.likeRecipe(token, parseInt(id));
+        const res = await api.likeRecipe(parseInt(id));
         newLikes = res.likes;
       }
 
@@ -115,9 +115,8 @@ export default function RecipeDetail() {
   const handleDelete = async () => {
     if (window.confirm('Biztosan törölni szeretnéd ezt a receptet?')) {
       try {
-        const token = localStorage.getItem('savorly_token');
-        if (token && id) {
-          await deleteRecipe(token, parseInt(id));
+        if (id) {
+          await deleteRecipe(parseInt(id));
           navigate('/');
         }
       } catch (e) {
@@ -127,7 +126,7 @@ export default function RecipeDetail() {
     }
   };
 
-  // Load progress on mount or when user/recipe changes
+
   useEffect(() => {
     if (user && id) {
       const savedProgress = localStorage.getItem(`savorly_progress_${user.userName}_${id}`);
@@ -144,7 +143,7 @@ export default function RecipeDetail() {
     }
   }, [user, id]);
 
-  // Save progress whenever it changes
+
   useEffect(() => {
     if (isLoaded && user && id) {
       localStorage.setItem(`savorly_progress_${user.userName}_${id}`, JSON.stringify(completedSteps));
@@ -153,6 +152,40 @@ export default function RecipeDetail() {
 
   const toggleStep = (index: number) => {
     setCompletedSteps((prev) =>
+      prev.includes(index)
+        ? prev.filter((i) => i !== index)
+        : [...prev, index]
+    );
+  };
+
+
+  const [completedIngredients, setCompletedIngredients] = useState<number[]>([]);
+
+
+  useEffect(() => {
+    if (user && id) {
+      const savedIngredients = localStorage.getItem(`savorly_ingredients_${user.userName}_${id}`);
+      if (savedIngredients) {
+        try {
+          setCompletedIngredients(JSON.parse(savedIngredients));
+        } catch (e) {
+          console.error('Failed to parse saved ingredients', e);
+        }
+      } else {
+        setCompletedIngredients([]);
+      }
+    }
+  }, [user, id]);
+
+
+  useEffect(() => {
+    if (isLoaded && user && id) {
+      localStorage.setItem(`savorly_ingredients_${user.userName}_${id}`, JSON.stringify(completedIngredients));
+    }
+  }, [completedIngredients, user, id, isLoaded]);
+
+  const toggleIngredient = (index: number) => {
+    setCompletedIngredients((prev) =>
       prev.includes(index)
         ? prev.filter((i) => i !== index)
         : [...prev, index]
@@ -186,7 +219,7 @@ export default function RecipeDetail() {
 
   return (
     <section className="min-h-screen pb-20">
-      {/* Hero Image */}
+
       <div className="relative h-[40vh] w-full overflow-hidden md:h-[50vh]">
         <div className="absolute inset-0 bg-slate-900/20" />
         {imageError ? (
@@ -211,7 +244,7 @@ export default function RecipeDetail() {
 
       <div className="mx-auto -mt-10 max-w-4xl px-4 relative z-10">
         <div className="rounded-3xl bg-white p-8 shadow-xl shadow-slate-200/20 md:p-12">
-          {/* Meta Data & Actions */}
+
           <div className="mb-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-slate-100 pb-8">
             <div className="flex flex-wrap gap-4 md:gap-8">
               <div className="flex items-center gap-3">
@@ -311,14 +344,14 @@ export default function RecipeDetail() {
             )}
           </div>
 
-          {/* Description */}
+
           <div className="prose prose-slate max-w-none mb-12">
             <h2 className="text-xl font-bold text-slate-900 mb-4">Leírás</h2>
             <p className="text-lg leading-relaxed text-slate-600">{recipe.description}</p>
           </div>
 
           <div className="grid gap-12 lg:grid-cols-[1fr_2fr]">
-            {/* Ingredients */}
+
             <div>
               <h3 className="mb-6 flex items-center gap-2 text-xl font-bold text-slate-900">
                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#BD95A4]/10 text-[#BD95A4]">
@@ -327,16 +360,33 @@ export default function RecipeDetail() {
                 Hozzávalók
               </h3>
               <ul className="space-y-3">
-                {recipe.ingredients.map((ingredient: string, idx: number) => (
-                  <li key={idx} className="flex items-start gap-3 rounded-xl bg-slate-50 p-3 transition-colors hover:bg-slate-100">
-                    <div className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#BD95A4]" />
-                    <span className="text-slate-700">{ingredient}</span>
-                  </li>
-                ))}
+                {recipe.ingredients.map((ingredient: string, idx: number) => {
+                  const isChecked = completedIngredients.includes(idx);
+                  return (
+                    <li
+                      key={idx}
+                      onClick={() => toggleIngredient(idx)}
+                      className={`flex items-start gap-3 rounded-xl p-3 transition-all cursor-pointer group ${isChecked
+                        ? 'bg-[#BD95A4]/10'
+                        : 'bg-slate-50 hover:bg-slate-100'
+                        }`}
+                    >
+                      <div className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${isChecked
+                        ? 'border-[#BD95A4] bg-[#BD95A4]'
+                        : 'border-slate-300 bg-white group-hover:border-[#BD95A4]'
+                        }`}>
+                        {isChecked && <Check size={12} className="text-white" strokeWidth={3} />}
+                      </div>
+                      <span className={`text-slate-700 transition-all ${isChecked ? 'line-through opacity-60' : ''}`}>
+                        {ingredient}
+                      </span>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
 
-            {/* Instructions */}
+
             <div>
               <h3 className="mb-6 flex items-center gap-2 text-xl font-bold text-slate-900">
                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#A1836C]/10 text-[#A1836C]">

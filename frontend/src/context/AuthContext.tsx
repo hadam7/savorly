@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { fetchMe, login as apiLogin, register as apiRegister, type LoginResponse } from '../api';
+import { fetchMe, login as apiLogin, register as apiRegister, logout as apiLogout } from '../api';
 
 interface User {
     userName: string;
@@ -14,79 +14,44 @@ interface AuthContextType {
     login: (userName: string, password: string) => Promise<void>;
     register: (userName: string, email: string, password: string) => Promise<void>;
     logout: () => void;
-    token: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-    const [user, setUser] = useState<User | null>(() => {
-        try {
-            const savedUser = localStorage.getItem('savorly_user');
-            return savedUser ? JSON.parse(savedUser) : null;
-        } catch {
-            return null;
-        }
-    });
-    const [authenticated, setAuthenticated] = useState(() => {
-        return !!localStorage.getItem('savorly_token');
-    });
+    const [user, setUser] = useState<User | null>(null);
+    const [authenticated, setAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const token = localStorage.getItem('savorly_token');
-        const savedUser = localStorage.getItem('savorly_user');
-
-        if (!token) {
-            setLoading(false);
-            setAuthenticated(false);
-            return;
-        }
-
-        if (savedUser) {
+        const checkAuth = async () => {
             try {
-                setUser(JSON.parse(savedUser));
-                setAuthenticated(true);
-            } catch (e) {
-                console.error('Failed to parse saved user', e);
-            }
-        }
-
-        (async () => {
-            try {
-                const data = await fetchMe(token);
+                const data = await fetchMe();
                 const userData = {
                     userName: data.userName ?? data.UserName ?? '',
                     email: data.email ?? data.Email,
                     role: data.role ?? data.Role ?? 'User',
                 };
                 setUser(userData);
-                localStorage.setItem('savorly_user', JSON.stringify(userData));
                 setAuthenticated(true);
             } catch (e) {
-                console.error('Auth check failed', e);
-                // If we have a saved user, keep them logged in even if backend fails
-                // This ensures persistence works even if the backend is stateless or restarts
-                if (!savedUser) {
-                    setAuthenticated(false);
-                    localStorage.removeItem('savorly_token');
-                    localStorage.removeItem('savorly_user');
-                }
+
+                setUser(null);
+                setAuthenticated(false);
             } finally {
                 setLoading(false);
             }
-        })();
+        };
+
+        checkAuth();
     }, []);
 
     const handleAuthSuccess = (resp: any) => {
         const userData = {
             userName: resp.userName || resp.UserName,
-            email: resp.email || resp.Email, // Ensure email is captured
+            email: resp.email || resp.Email,
             role: resp.role || resp.Role || 'User'
         };
-
-        localStorage.setItem('savorly_token', resp.token || resp.Token);
-        localStorage.setItem('savorly_user', JSON.stringify(userData));
 
         setUser(userData);
         setAuthenticated(true);
@@ -102,15 +67,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         handleAuthSuccess(resp);
     };
 
-    const logout = () => {
-        localStorage.removeItem('savorly_token');
-        localStorage.removeItem('savorly_user');
-        setUser(null);
-        setAuthenticated(false);
+    const logout = async () => {
+        try {
+            await apiLogout();
+        } catch (e) {
+            console.error('Logout failed', e);
+        } finally {
+            setUser(null);
+            setAuthenticated(false);
+        }
     };
 
     return (
-        <AuthContext.Provider value={{ user, authenticated, loading, login, register, logout, token: localStorage.getItem('savorly_token')?.replace(/"/g, '').trim() || null }}>
+        <AuthContext.Provider value={{ user, authenticated, loading, login, register, logout }}>
             {children}
         </AuthContext.Provider>
     );
